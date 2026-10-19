@@ -178,7 +178,6 @@ void AssetManagerDestroy(AssetManager *manager)
     PaletteFreeStringVec(&manager->assets_list);
     kh_destroy(TextureMap, manager->texture_map);
     kh_destroy(SoundMap, manager->sound_map);
-
     manager->texture_map = NULL;
     manager->sound_map = NULL;
 }

@@ -33,9 +33,9 @@ static void Maximize(SDL_Window *window)
         LOG_ERROR("Failed to maximize window: %s", SDL_GetError());
 }
 
-static void SetSize(SDL_Window *window, uint16 width, uint16 height)
+static void SetSize(SDL_Window *window, float32 width, float32 height)
 {
-    if (UNLIKELY(!SDL_SetWindowSize(window, width, height)))
+    if (UNLIKELY(!SDL_SetWindowSize(window, (int32)width, (int32)height)))
         LOG_ERROR("Failed to set window size: %s", SDL_GetError());
 }
 
@@ -54,7 +54,8 @@ SDL_Window *WindowCreate(const AppInfo *app_info)
         flags |= SDL_WINDOW_FULLSCREEN;
     if (app_info->window_resizable)
         flags |= SDL_WINDOW_RESIZABLE;
-    SDL_Window *window = SDL_CreateWindow(app_info->name, app_info->window_width, app_info->window_height, flags);
+    SDL_Window *window =
+        SDL_CreateWindow(app_info->name, (int32)app_info->window_width, (int32)app_info->window_height, flags);
     if (!window)
         LOG_ERROR("Failed to create window: %s", SDL_GetError());
     return window;
@@ -85,7 +86,8 @@ void WindowInfoSetVersion(AppInfo *app_info, const char *version)
 {
     app_info->version = version;
 }
-void WindowInfoSetSize(AppInfo *app_info, uint16 width, uint16 height)
+
+void WindowInfoSetSize(AppInfo *app_info, float32 width, float32 height)
 {
     app_info->window_width = width;
     app_info->window_height = height;
@@ -134,14 +136,14 @@ uint8 WindowGetScale()
     return (uint8)c;
 }
 
-int32 WindowGetWidth()
+float32 WindowGetWidth()
 {
-    return (int32)g_app.info.window_width;
+    return g_app.info.window_width;
 }
 
-int32 WindowGetHeight()
+float32 WindowGetHeight()
 {
-    return (int32)g_app.info.window_height;
+    return g_app.info.window_height;
 }
 
 int32 WindowGetUniverseWidth()
@@ -177,29 +179,29 @@ ivec2s WindowDimensions(SDL_Window *window)
     return result;
 }
 
-void ApplyResizing(AppInfo *app_info, int16 width, int16 height)
+void ApplyResizing(AppInfo *app_info, float32 width, float32 height)
 {
-    int8 coeff_w = width / (int16)app_info->window_universe_width;
-    int8 coeff_h = height / (int16)app_info->window_universe_height;
+    int8 coeff_w = (int8)(width / (float32)app_info->window_universe_width);
+    int8 coeff_h = (int8)(height / (float32)app_info->window_universe_height);
     int8 coeff = (coeff_w < coeff_h) ? coeff_w : coeff_h;
     if (coeff < 1)
         coeff = 1;
 
-    int16 real_w = (int16)app_info->window_universe_width * coeff;
-    int16 real_h = (int16)app_info->window_universe_height * coeff;
+    float32 real_w = (float32)app_info->window_universe_width * (float32)coeff;
+    float32 real_h = (float32)app_info->window_universe_height * (float32)coeff;
 
-    float32 offset_x = (float32)(width - real_w) / 2.0f / (float32)coeff;
-    float32 offset_y = (float32)(height - real_h) / 2.0f / (float32)coeff;
+    float32 offset_x = (width - real_w) / 2.0f / (float32)coeff;
+    float32 offset_y = (height - real_h) / 2.0f / (float32)coeff;
 
-    if (offset_x < 0)
-        offset_x = 0;
-    if (offset_y < 0)
-        offset_y = 0;
+    if (offset_x < 0.0f)
+        offset_x = 0.0f;
+    if (offset_y < 0.0f)
+        offset_y = 0.0f;
 
     app_info->window_width = real_w;
     app_info->window_height = real_h;
-    app_info->offset_x = (int16)roundf(offset_x);
-    app_info->offset_y = (int16)roundf(offset_y);
+    app_info->offset_x = offset_x;
+    app_info->offset_y = offset_y;
 
     WindowConfigureScale(coeff, coeff);
 
@@ -240,7 +242,7 @@ void WindowApplyConfig(AppInfo *app_info)
     {
         SetFullscreen(window, true);
         ivec2s vec = WindowDimensions(window);
-        ApplyResizing(app_info, vec.x, vec.y);
+        ApplyResizing(app_info, (float32)vec.x, (float32)vec.y);
         app_info->window_maximised = false;
     }
     else if (app_info->window_maximised)
@@ -248,7 +250,7 @@ void WindowApplyConfig(AppInfo *app_info)
         SetFullscreen(window, false);
         Maximize(window);
         ivec2s vec = WindowDimensions(window);
-        ApplyResizing(app_info, vec.x, vec.y);
+        ApplyResizing(app_info, (float32)vec.x, (float32)vec.y);
     }
     else
     {
@@ -266,8 +268,8 @@ void WindowApplyConfig(AppInfo *app_info)
         }
         SetFullscreen(window, false);
         SetSize(window, app_info->window_width, app_info->window_height);
-        SetPosition(window, bounds.x + (bounds.w - app_info->window_width) / 2,
-                    bounds.y + (bounds.h - app_info->window_height) / 2);
+        SetPosition(window, bounds.x + (bounds.w - (int32)app_info->window_width) / 2,
+                    bounds.y + (bounds.h - (int32)app_info->window_height) / 2);
         ApplyResizing(app_info, app_info->window_width, app_info->window_height);
     }
 

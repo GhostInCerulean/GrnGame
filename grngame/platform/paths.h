@@ -27,6 +27,9 @@ bool FileIsLoadableText(const char *file);
 /// Returns true if the file can be loaded as a json
 bool FileIsLoadableJson(const char *file);
 
+/// Returns true if the file can loaded as a tff
+bool FileIsLoadableTtf(const char *file);
+
 /// Returns the path starting from the path of the executable where we added relative. You must free it.
 /// For example , if your exe is in ~/chouffe and relative is assets/folder, it returns ~/chouffe/assets/folder
 char *PathFromExecutableDirectory(const char *relative);

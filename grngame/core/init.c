@@ -20,6 +20,7 @@
 #include "grngame/utils/time.h"
 #include "grngame/utils/version.h"
 #include "kvec.h"
+#include "text.h"
 #include <SDL3/SDL.h>
 #include <stdlib.h>
 

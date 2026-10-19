@@ -20,6 +20,7 @@ void RegisterWindowModule(void);
 void RegisterEventModule(void);
 void RegisterJsonModule(void);
 void RegisterExitModule();
+void RegisterTextModule();
 
 static void WrenStartVM()
 {
@@ -99,6 +100,7 @@ static void RegisterWrenModules(void)
     RegisterTimeModule();
     RegisterWindowModule();
     RegisterEventModule();
+    RegisterTextModule();
     RegisterJsonModule();
     RegisterExitModule();
 }

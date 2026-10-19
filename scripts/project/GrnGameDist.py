@@ -163,3 +163,4 @@ if __name__ == "__main__":
     bundle_runtime(RUNTIME_DIR, project_dir)
     bundle_assets(project_dir)
     bundle_assets_pak(project_dir)
+    bundle_metadata(project_dir)

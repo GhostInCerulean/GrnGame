@@ -1,0 +1,20 @@
+{
+    "Config": {
+        "name": "game",
+        "version": "1.0.0",
+        "fps": 60,
+        "windowWidth": 480,
+        "windowHeight": 180,
+        "universeWidth": 180,
+        "universeHeight": 180,
+        "resizable": true,
+        "fullscreen": false,
+        "maximised": false,
+        "bordered": true,
+        "logDestination": 0,
+        "forceUniverseScale": true,
+        "assetFolder": "assets",
+        "enable_palette": false,
+        "palette": []
+    }
+}

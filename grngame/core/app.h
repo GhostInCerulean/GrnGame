@@ -5,6 +5,7 @@
 #include "grngame/assets/asset_manager.h"
 #include "grngame/audio/sound_manager.h"
 #include "grngame/bindings/wren/wren_api.h"
+#include "grngame/core/text.h"
 #include "grngame/data/json.h"
 #include "grngame/data/sqlite.h"
 #include "grngame/dev/hotreload.h"
@@ -42,8 +43,8 @@ typedef struct AppInfo
 
     uint16 window_universe_width;
     uint16 window_universe_height;
-    uint16 window_width;
-    uint16 window_height;
+    float32 window_width;
+    float32 window_height;
 
     bool window_resizable;
     bool window_fullscreen;
@@ -52,8 +53,8 @@ typedef struct AppInfo
     bool window_occlusion_culled;
     bool bordered;
 
-    int16 offset_x;
-    int16 offset_y;
+    float32 offset_x;
+    float32 offset_y;
 
     bool force_universe_scale; // apply black stripes to the window
 

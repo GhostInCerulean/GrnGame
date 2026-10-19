@@ -10,7 +10,7 @@ BEGIN_DECLARATIONS
 SDL_Window *WindowCreate(const AppInfo *app_info);
 
 // Setters
-void WindowInfoSetSize(AppInfo *app_info, uint16 width, uint16 height);
+void WindowInfoSetSize(AppInfo *app_info, float32 width, float32 height);
 void WindowInfoSetUniverseSize(AppInfo *app_info, uint16 width, uint16 height);
 void WindowInfoSetFullscreen(AppInfo *app_info, bool fullscreen);
 void WindowInfoSetMaximised(AppInfo *app_info, bool maximised);
@@ -25,8 +25,8 @@ void WindowApplyConfig(AppInfo *app_info);
 
 // Getters
 uint8 WindowGetScale();
-int32 WindowGetWidth();
-int32 WindowGetHeight();
+float32 WindowGetWidth(void);
+float32 WindowGetHeight(void);
 int32 WindowGetUniverseWidth();
 int32 WindowGetUniverseHeight();
 float32 WindowGetOffsetX();
@@ -37,7 +37,7 @@ bool WindowGetChange();
 
 ivec2s WindowDimensions(SDL_Window *window);
 bool WindowConfigureScale(uint8 scalex, uint8 scaley);
-void ApplyResizing(AppInfo *app_info, int16 width, int16 height);
+void ApplyResizing(AppInfo *app_info, float32 width, float32 height);
 void ApplyBlackStripes();
 bool SetAppMetadata(AppInfo *app_info, const char *appname, const char *appversion, const char *appidentifier);
 

@@ -13,12 +13,14 @@ HOT bool SpriteDraw(Sprite s, uint16 frame, float32 x, float32 y, uint8 c, int16
 {
     bool find = false;
     if (!s.find)
+    {
         s.tex = FindImage(s.name, &find);
 
-    if (!find)
-    {
-        LOG_WARNING("Impossible to get texture: %s,default is set to 16x16", s.name);
-        return false;
+        if (!find)
+        {
+            LOG_WARNING("Impossible to get texture: %s,default is set to 16x16", s.name);
+            return false;
+        }
     }
 
     Texture tex = s.tex;
