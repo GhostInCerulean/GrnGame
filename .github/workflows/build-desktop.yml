@@ -40,10 +40,10 @@ jobs:
       - name: update xmake repo
         run: xmake repo -u
 
-      #freetype is not static on macos when its on the system
-      - name: Remove homebrew freetype
-        if: runner.os == 'macOS'
-        run: brew uninstall --ignore-dependencies freetype
+      # #freetype is not static on macos when its on the system
+      # - name: Remove homebrew freetype
+      #   if: runner.os == 'macOS'
+      #   run: brew uninstall --ignore-dependencies freetype
 
       - name: Configure
         run: >

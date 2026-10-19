@@ -17,7 +17,6 @@ function setup_requires()
 	-- if we update sdl version we need to update android-build because its based on sdl build
 	add_requires("libsdl3 3.4.12", { configs = { shared = false, threads = true } })
 	add_requires("libsdl3_image", { configs = { shared = false } })
-	add_requires("libsdl3_ttf", { configs = { shared = false, freetype = false }, system = false })
 
 	-- maths
 	add_requires("klib", { configs = { shared = false } })
@@ -49,7 +48,6 @@ function apply_game_packages()
 	add_packages(
 		"libsdl3",
 		"libsdl3_image",
-		"libsdl3_ttf",
 		"klib",
 		"cglm",
 		"soloud",
