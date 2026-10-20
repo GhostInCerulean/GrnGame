@@ -13,8 +13,8 @@ function setup_global_flags()
 	if is_plat("wasm") then
 		add_defines("GRNGAME_WASM", { public = true })
 		add_ldflags(
-			"--shell-file",
-			"grngame/web/shell.html",
+			-- "--shell-file",
+			-- "grngame/web/shell.html",
 			"-sFORCE_FILESYSTEM=1",
 			"-sASYNCIFY",
 			"-sINITIAL_MEMORY=512MB",
