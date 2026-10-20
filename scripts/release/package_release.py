@@ -19,6 +19,7 @@ METADATA_FILE = RESSOURCES_DIR / "metadata.json"
 READ_METADATA_SCRIPT = SCRIPTS_DIR / "metadata" / "read_metadata.py"
 SETUP_SCRIPTS_DIR = SCRIPTS_DIR / "project"
 SERVER_SCRIPT = SCRIPTS_DIR / "server.py"
+INDEX = RESSOURCES_DIR / "index.html"
 IOS_SCRIPT = SCRIPTS_DIR / "xcode_ios_project.py"
 
 ANDROID_LIB_NAME = "libGrnGame.so"
@@ -59,7 +60,7 @@ SETUP_SCRIPTS = [
 
 PROJECT_MODEL_DIRS = ["assets", "data", "config"]
 
-IGNORED_SUFFIXES = {".lib", ".exp", ".pdb", ".a", ".ilk"}
+IGNORED_SUFFIXES = {".lib", ".exp", ".pdb", ".a", ".ilk", ".html"}
 IGNORED_FILES = shutil.ignore_patterns(*(f"*{suffix}" for suffix in IGNORED_SUFFIXES))
 
 
@@ -120,6 +121,9 @@ def bundle_setup_scripts(stage_dir: Path) -> None:
 def bundle_server_script(stage_dir: Path) -> None:
     copy_file(SERVER_SCRIPT, runtime_dir(stage_dir))
 
+def bundle_server_index(stage_dir: Path) -> None:
+    copy_file(INDEX, runtime_dir(stage_dir))
+
 
 def bundle_ios_script(stage_dir: Path) -> None:
     copy_file(IOS_SCRIPT, runtime_dir(stage_dir))
@@ -175,6 +179,7 @@ def build_stage(platform: str, stage_dir: Path) -> None:
     bundle_metadata(stage_dir)
     bundle_setup_scripts(stage_dir)
     bundle_server_script(stage_dir)
+    bundle_server_index(stage_dir)
     bundle_desktop_binary(platform, stage_dir)
     bundle_runtimes(stage_dir)
     bundle_android(stage_dir)
