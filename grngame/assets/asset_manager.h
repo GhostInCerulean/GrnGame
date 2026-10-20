@@ -7,7 +7,6 @@
 #include "grngame/utils/attributes.h"
 #include "grngame/utils/c_cpp.h"
 #include <SDL3_mixer/SDL_mixer.h>
-#include <SDL3_ttf/SDL_ttf.h>
 #include <khash.h>
 
 typedef struct LoadResult LoadResult;

@@ -7,7 +7,6 @@
 #include "grngame/renderer/sprite.h"
 #include "grngame/utils/attributes.h"
 #include "grngame/utils/string_compat.h"
-#include <SDL3_ttf/SDL_ttf.h>
 
 static const PatternLetter DEFAULT_FONT_PATTERN[] = {
     {'A', 0, 0}, {'B', 0, 0}, {'C', 0, 0}, {'D', 0, 0}, {'E', 0, 0},  {'F', 0, 0}, {'G', 0, 0}, {'H', 0, 0},

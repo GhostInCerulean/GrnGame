@@ -3,7 +3,7 @@
 #include "cglm/types-struct.h"
 #include "grngame/math/types.h"
 #include "grngame/utils/c_cpp.h"
-#include <SDL3_ttf/SDL_ttf.h>
+#include <stdbool.h>
 
 BEGIN_DECLARATIONS
 
