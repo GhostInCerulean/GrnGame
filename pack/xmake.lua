@@ -20,8 +20,3 @@ xpack("grngame")
              Part="last" Action="set" System="yes" Permanent="no" />
 ]])
         end)
-    elseif is_plat("linux") then
-        set_formats("deb")
-        add_installfiles(stage .. "/(**)", {prefixdir = "lib/grngame"})
-        add_installfiles("launchers/(*)",  {prefixdir = "bin"})
-    end

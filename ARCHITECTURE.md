@@ -23,8 +23,7 @@ resources, Java integration and application settings are stored here.
 
 ### `/ressources`
 
-Contains the default project resources, including the Wren entry point,
-metadata, configuration and the HTML page used by the project.
+Contains the default project resources.
 
 ### `/scripts`
 
