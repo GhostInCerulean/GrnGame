@@ -50,7 +50,6 @@ function apply_game_packages()
 		"libsdl3_image",
 		"klib",
 		"cglm",
-		"soloud",
 		"wren",
 		"freetype",
 		"sqlite3",
