@@ -232,7 +232,7 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--name", help="game name")
     p.add_argument("--bundle-id", help="unique bundle ID")
-    p.add_argument("--version", help="version (default 1.0)")
+    p.add_argument("--version", help="version (default 1.0.0)")
     p.add_argument("--build", help="build number (default 1)")
     p.add_argument("--dist", help="exported ios-arm64 folder")
     p.add_argument("--icon", help=f"{SIZE_ICON}x{SIZE_ICON} icon")
@@ -254,7 +254,7 @@ def main() -> None:
     args.bundle_id = ask_user(
         args.bundle_id, "Unique bundle ID", check=check_bundle_id
     )
-    args.version = ask_user(args.version, "Version", "1.0")
+    args.version = ask_user(args.version, "Version", "1.0.0")
     args.build = ask_user(args.build, "Build number", "1")
 
     dist = ask_user(
