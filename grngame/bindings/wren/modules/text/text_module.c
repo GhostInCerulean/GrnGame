@@ -2,7 +2,6 @@
 #include "grngame/bindings/wren/modules/vec2_module.h"
 #include "grngame/core/app.h"
 #include "wren.h"
-#include <corecrt_search.h>
 
 void draw_text(WrenVM *vm)
 {

@@ -4,7 +4,7 @@
 #include "grngame/dev/logging.h"
 #include "grngame/utils/clear.h"
 #include "wren.h"
-#include <corecrt_search.h>
+
 #include <stdlib.h>
 #include <string.h>
 
