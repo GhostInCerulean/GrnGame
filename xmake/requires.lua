@@ -55,7 +55,6 @@ function apply_game_packages()
 		"freetype",
 		"sqlite3",
 		"highway",
-		"Libimagequant",
 		"cjson",
 		"libsdl3_mixer",
 		{ public = true }
