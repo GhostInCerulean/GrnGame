@@ -7,15 +7,37 @@
 
 BEGIN_DECLARATIONS
 
-typedef struct PaternLetter
+#define FONT_PATTERN_MAX 128 // size of a char
+
+// intern
+typedef struct TextLayout
+{
+    float32 start_x;
+    float32 start_y;
+    float32 cursor_x;
+    float32 cursor_y;
+    float32 line_height;
+    float32 current_line_width;
+    float32 max_line_width;
+    bool line_start;
+} TextLayout;
+
+typedef struct PatternLetter
 {
     char letter;
-    int16 x_left;  // + add more space - add less space
-    int16 y_right; // + add more space - add less space
+    vec2s size;     // x = left, y = right
+    int32 y_offset; // offset for ex: g, p, q, y
 } PatternLetter;
 
-bool TextDraw(const char *font_name, const PatternLetter *pattern, const char *text, float32 x, float32 y,
-              uint16 char_w, uint16 char_h, int32 space_between_letters, int32 max_width, uint8 coeff, uint8 alpha,
-              int32 *size_out_w, int32 *size_out_h);
+typedef struct Font
+{
+    const char *name;
+    PatternLetter pattern[FONT_PATTERN_MAX];
+    vec2s size_of_case;
+    int32 space_size;
+} Font;
+
+bool TextDraw(const Font *font, const char *text, vec2s position, int32 space_between_letters, int32 max_width,
+              uint8 coeff, uint8 alpha, vec2s *size_out);
 
 END_DECLARATIONS

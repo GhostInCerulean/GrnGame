@@ -190,8 +190,8 @@ void ApplyResizing(AppInfo *app_info, float32 width, float32 height)
     float32 real_w = (float32)app_info->window_universe_width * (float32)coeff;
     float32 real_h = (float32)app_info->window_universe_height * (float32)coeff;
 
-    float32 offset_x = (width - real_w) / 2.0f / (float32)coeff;
-    float32 offset_y = (height - real_h) / 2.0f / (float32)coeff;
+    float32 offset_x = PIXEL_ALIGN((width - real_w) / 2.0f / (float32)coeff);
+    float32 offset_y = PIXEL_ALIGN((height - real_h) / 2.0f / (float32)coeff);
 
     if (offset_x < 0.0f)
         offset_x = 0.0f;
@@ -210,25 +210,24 @@ void ApplyResizing(AppInfo *app_info, float32 width, float32 height)
 
 void ApplyBlackStripes()
 {
-    if (g_app.info.force_universe_scale)
-    {
-        float32 off_x = g_app.info.offset_x;
-        float32 off_y = g_app.info.offset_y;
-        float32 uw = (float32)g_app.info.window_universe_width;
-        float32 uh = (float32)g_app.info.window_universe_height;
-        float32 total_w = uw + 2.0f * off_x;
-        float32 total_h = uh + 2.0f * off_y;
+    if (!g_app.info.force_universe_scale)
+        return;
 
-        SDL_FRect rects[4] = {
-            {0.0f, 0.0f, off_x, total_h},
-            {off_x + uw, 0.0f, off_x, total_h},
-            {0.0f, 0.0f, total_w, off_y},
-            {0.0f, off_y + uh, total_w, off_y},
-        };
+    const float32 off_x = PIXEL_ALIGN(g_app.info.offset_x);
+    const float32 off_y = PIXEL_ALIGN(g_app.info.offset_y);
+    const float32 uw = (float32)g_app.info.window_universe_width;
+    const float32 uh = (float32)g_app.info.window_universe_height;
+    const float32 big = 4096.0f;
 
-        RendererSetColor(10, 10, 10, 255);
-        RendererFillRects(rects, 4);
-    }
+    SDL_FRect rects[4] = {
+        {-big, -big, big + off_x, 2.0f * big},
+        {off_x + uw, -big, big, 2.0f * big},
+        {-big, -big, 2.0f * big, big + off_y},
+        {-big, off_y + uh, 2.0f * big, big},
+    };
+
+    RendererSetColor(10, 10, 10, 255);
+    RendererFillRects(rects, 4);
 }
 
 void WindowApplyConfig(AppInfo *app_info)

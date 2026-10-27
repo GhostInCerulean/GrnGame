@@ -3,13 +3,12 @@
 #include "grngame/core/app.h"
 #include "grngame/dev/logging.h"
 #include "grngame/math/math.h"
-#include "grngame/utils/attributes.h"
 #include "kvec.h"
 #include "renderer.h"
 #include "texture.h"
 #include <math.h>
 
-HOT bool SpriteDraw(Sprite s, uint16 frame, float32 x, float32 y, uint8 c, int16 r, uint8 a)
+bool SpriteDraw(Sprite s, uint16 frame, float32 x, float32 y, uint8 c, int16 r, uint8 a)
 {
     bool find = false;
     if (!s.find)
@@ -29,8 +28,8 @@ HOT bool SpriteDraw(Sprite s, uint16 frame, float32 x, float32 y, uint8 c, int16
 
     if (OffScreen(x, y, (float32)(tex_w * c), (float32)(tex.h * c)))
     {
-        LOG_DEBUG("Cant draw %s because it offscreen in :%f,%f", s.name, x, y);
-        return false;
+        // LOG_DEBUG("Cant draw %s because it offscreen in :%f,%f", s.name, x, y);
+        return true;
     }
 
     int16 cols = tex_w / s.w;

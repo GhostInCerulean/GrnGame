@@ -8,6 +8,7 @@
 #include <grngame/utils/string_compat.h>
 #include <stdlib.h>
 
+// update here when you add a module
 void RegisterControllerModule(void);
 void RegisterInputTextModule(void);
 void RegisterKeyboardModule(void);
@@ -21,6 +22,30 @@ void RegisterEventModule(void);
 void RegisterJsonModule(void);
 void RegisterExitModule();
 void RegisterTextModule();
+void RegisterVec2Module();
+void RegisterPatternLetterModule();
+void RegisterFontModule();
+
+static void RegisterWrenModules(void)
+{
+    InitBindingSystem();
+    RegisterControllerModule();
+    RegisterInputTextModule();
+    RegisterKeyboardModule();
+    RegisterLogModule();
+    RegisterMouseModule();
+    RegisterRendererModule();
+    RegisterSoundModule();
+    RegisterTimeModule();
+    RegisterWindowModule();
+    RegisterEventModule();
+    RegisterTextModule();
+    RegisterJsonModule();
+    RegisterExitModule();
+    RegisterVec2Module();
+    RegisterPatternLetterModule();
+    RegisterFontModule();
+}
 
 static void WrenStartVM()
 {
@@ -85,24 +110,6 @@ static bool WrenInterpret(const char *filename)
     }
 
     return true;
-}
-
-static void RegisterWrenModules(void)
-{
-    InitBindingSystem();
-    RegisterControllerModule();
-    RegisterInputTextModule();
-    RegisterKeyboardModule();
-    RegisterLogModule();
-    RegisterMouseModule();
-    RegisterRendererModule();
-    RegisterSoundModule();
-    RegisterTimeModule();
-    RegisterWindowModule();
-    RegisterEventModule();
-    RegisterTextModule();
-    RegisterJsonModule();
-    RegisterExitModule();
 }
 
 bool WrenInitFromMemory()

@@ -31,7 +31,7 @@ bool RendererTryCreate(SDL_Window *window, Renderer *renderer)
 
 bool RendererClear(const Renderer *renderer)
 {
-    RendererSetColor(0, 0, 0, 255);
+    RendererSetColor(255, 255, 255, 255);
     if (UNLIKELY(!SDL_RenderClear(renderer->renderer)))
     {
 

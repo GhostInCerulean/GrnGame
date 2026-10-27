@@ -1,190 +1,162 @@
-// todo : factorise
 #include "text.h"
 #include "../math/types.h"
 #include "cglm/types-struct.h"
 #include "grngame/assets/asset_manager.h"
 #include "grngame/dev/logging.h"
 #include "grngame/renderer/sprite.h"
-#include "grngame/utils/attributes.h"
 #include "grngame/utils/string_compat.h"
 
-static const PatternLetter DEFAULT_FONT_PATTERN[] = {
-    {'A', 0, 0}, {'B', 0, 0}, {'C', 0, 0}, {'D', 0, 0}, {'E', 0, 0},  {'F', 0, 0}, {'G', 0, 0}, {'H', 0, 0},
-    {'I', 0, 0}, {'J', 0, 0}, {'K', 0, 0}, {'L', 0, 0}, {'M', 0, 0},  {'N', 0, 0}, {'O', 0, 0}, {'P', 0, 0},
-    {'Q', 0, 0}, {'R', 0, 0}, {'S', 0, 0}, {'T', 0, 0}, {'U', 0, 0},  {'V', 0, 0}, {'W', 0, 0}, {'X', 0, 0},
-    {'Y', 0, 0}, {'Z', 0, 0}, {'a', 0, 0}, {'b', 0, 0}, {'c', 0, 0},  {'d', 0, 0}, {'e', 0, 0}, {'f', 0, 0},
-    {'g', 0, 0}, {'h', 0, 0}, {'i', 0, 0}, {'j', 0, 0}, {'k', 0, 0},  {'l', 0, 0}, {'m', 0, 0}, {'n', 0, 0},
-    {'o', 0, 0}, {'p', 0, 0}, {'q', 0, 0}, {'r', 0, 0}, {'s', 0, 0},  {'t', 0, 0}, {'u', 0, 0}, {'v', 0, 0},
-    {'w', 0, 0}, {'x', 0, 0}, {'y', 0, 0}, {'z', 0, 0}, {'0', 0, 0},  {'1', 0, 0}, {'2', 0, 0}, {'3', 0, 0},
-    {'4', 0, 0}, {'5', 0, 0}, {'6', 0, 0}, {'7', 0, 0}, {'8', 0, 0},  {'9', 0, 0}, {'.', 0, 0}, {',', 0, 0},
-    {'!', 0, 0}, {'?', 0, 0}, {':', 0, 0}, {';', 0, 0}, {'\'', 0, 0}, {'-', 0, 0}, {'(', 0, 0}, {')', 0, 0},
-    {' ', 0, 0}, {'\0', 0, 0}};
+static void LayoutNewLine(TextLayout *l)
+{
+    if (l->current_line_width > l->max_line_width)
+        l->max_line_width = l->current_line_width;
 
-static inline int32 FindPatternLetter(const PatternLetter *pattern, char c)
+    l->cursor_x = l->start_x;
+    l->cursor_y += l->line_height;
+    l->current_line_width = 0.0f;
+    l->line_start = true;
+}
+
+static bool LayoutOverflows(const TextLayout *l, float32 width, int32 max_width)
+{
+    return !l->line_start && (l->cursor_x - l->start_x + width) > (float32)max_width;
+}
+
+static void SetSizeOut(vec2s *size_out, float32 x, float32 y)
+{
+    if (size_out)
+        *size_out = (vec2s){.x = x, .y = y};
+}
+
+static int32 FindPatternLetter(const Font *font, char c)
 {
     // todo o(1)
-    for (int32 i = 0; pattern[i].letter != '\0'; i++)
+    for (int32 i = 0; i < FONT_PATTERN_MAX && font->pattern[i].letter != '\0'; i++)
     {
-        if (pattern[i].letter == c)
+        if (font->pattern[i].letter == c)
             return i;
     }
     return -1;
 }
 
-static float32 GetWordWidth(const char *word, const PatternLetter *pattern, uint16 char_w, int32 space_between_letters,
-                            uint8 c)
+static float32 GlyphWidth(const Font *font, char c, int32 idx, uint8 coeff)
+{
+    // space is not a texture
+    if (c == ' ')
+        return (float32)(font->space_size * coeff);
+
+    float32 w = font->size_of_case.x;
+    if (idx >= 0)
+        w += font->pattern[idx].size.x + font->pattern[idx].size.y;
+    return w * (float32)coeff;
+}
+
+static float32 GetWordWidth(const Font *font, const char *word, int32 space_between_letters, uint8 coeff)
 {
     float32 width = 0.0f;
+    int32 count = 0;
+
     for (uint32 i = 0; word[i] != '\0' && word[i] != ' ' && word[i] != '\n'; i++)
     {
-        int32 idx = FindPatternLetter(pattern, word[i]);
-        if (idx < 0)
-        {
-            width += (float32)((char_w + space_between_letters) * c);
-            continue;
-        }
-
-        int16 x_left = pattern[idx].x_left;
-        int16 y_right = pattern[idx].y_right;
-
-        width += (float32)(((int32)char_w + x_left + y_right + space_between_letters) * c);
+        width += GlyphWidth(font, word[i], FindPatternLetter(font, word[i]), coeff) + (float32)space_between_letters;
+        count++;
     }
 
-    if (width > 0.0f)
-    {
-        width -= (float32)(space_between_letters * c);
-    }
+    if (count > 0)
+        width -= (float32)space_between_letters;
     return width;
 }
 
-bool TextDraw(const char *font_name, const PatternLetter *pattern, const char *text, float32 x, float32 y,
-              uint16 char_w, uint16 char_h, int32 space_between_letters, int32 max_width, uint8 c, uint8 a,
-              int32 *size_out_w, int32 *size_out_h)
+bool TextDraw(const Font *font, const char *text, vec2s position, int32 space_between_letters, int32 max_width,
+              uint8 coeff, uint8 alpha, vec2s *size_out)
 {
-    if (UNLIKELY(!font_name || !text))
-    {
-        if (size_out_w)
-            *size_out_w = 0;
-        if (size_out_h)
-            *size_out_h = 0;
-        return false;
-    }
-
-    if (!pattern || pattern[0].letter == '\0')
-    {
-        LOG_WARNING("Pattern is NULL or empty for font '%s', using default pattern.", font_name);
-        pattern = DEFAULT_FONT_PATTERN;
-    }
+    SetSizeOut(size_out, 0.0f, 0.0f);
 
     bool find = false;
-
-    // set manually texture to do better log
-    Texture tex = FindImage(font_name, &find);
+    Texture tex = FindImage(font->name, &find);
     if (!find)
     {
-        LOG_WARNING("Impossible to get font texture: %s", font_name);
-        if (size_out_w)
-            *size_out_w = 0;
-        if (size_out_h)
-            *size_out_h = 0;
+        LOG_WARNING("Impossible to get font texture: %s", font->name);
         return false;
     }
 
-    Sprite s = {.w = char_w, .h = char_h, .tex = tex, .find = true, .name = font_name};
+    Sprite sprite = {
+        .w = font->size_of_case.x, .h = font->size_of_case.y, .tex = tex, .find = true, .name = font->name};
 
-    float32 start_x = x;
-    float32 start_y = y;
-    float32 cursor_x = start_x;
-    float32 cursor_y = start_y;
-    float32 line_height = (float32)(char_h * c);
+    TextLayout l = {
+        .start_x = position.x,
+        .start_y = position.y,
+        .cursor_x = position.x,
+        .cursor_y = position.y,
+        .line_height = font->size_of_case.y * (float32)coeff,
+        .line_start = true,
+    };
 
-    float32 max_line_width = 0.0f;
-    float32 current_line_width = 0.0f;
+    const float32 spacing = (float32)space_between_letters;
     bool all_drawn = true;
 
     for (uint32 i = 0; text[i] != '\0'; i++)
     {
-        if (text[i] == '\n')
-        {
-            if (current_line_width > max_line_width)
-                max_line_width = current_line_width;
+        const char ch = text[i];
 
-            cursor_x = start_x;
-            cursor_y += line_height;
-            current_line_width = 0.0f;
+        if (ch == '\n')
+        {
+            LayoutNewLine(&l);
             continue;
         }
-
-        if (max_width > 0 && text[i] != ' ' && (i == 0 || text[i - 1] == ' ' || text[i - 1] == '\n'))
+        const bool word_start = (ch != ' ') && (i == 0 || text[i - 1] == ' ' || text[i - 1] == '\n');
+        if (max_width > 0 && word_start &&
+            LayoutOverflows(&l, GetWordWidth(font, &text[i], space_between_letters, coeff), max_width))
         {
-            float32 word_w = GetWordWidth(&text[i], pattern, char_w, space_between_letters, c);
-            if (cursor_x > start_x && (cursor_x - start_x + word_w) > (float32)max_width)
-            {
-                if (current_line_width > max_line_width)
-                    max_line_width = current_line_width;
-
-                cursor_x = start_x;
-                cursor_y += line_height;
-                current_line_width = 0.0f;
-            }
+            LayoutNewLine(&l);
         }
 
-        int32 idx = FindPatternLetter(pattern, text[i]);
-        int16 x_left = (idx >= 0) ? pattern[idx].x_left : 0;
-        int16 y_right = (idx >= 0) ? pattern[idx].y_right : 0;
+        const int32 idx = (ch == ' ') ? -1 : FindPatternLetter(font, ch);
+        const float32 glyph_w = GlyphWidth(font, ch, idx, coeff);
 
-        float32 char_visual_width = (float32)(((int32)char_w + x_left + y_right) * c);
-        if (max_width > 0 && cursor_x > start_x && (cursor_x - start_x + char_visual_width) > (float32)max_width)
+        if (max_width > 0 && LayoutOverflows(&l, glyph_w, max_width))
         {
-            if (current_line_width > max_line_width)
-                max_line_width = current_line_width;
-
-            cursor_x = start_x;
-            cursor_y += line_height;
-            current_line_width = 0.0f;
-            if (text[i] == ' ')
+            LayoutNewLine(&l);
+            if (ch == ' ')
                 continue;
+        }
+
+        if (ch == ' ')
+        {
+            l.cursor_x += glyph_w + spacing;
+            l.line_start = false;
+            continue;
         }
 
         if (idx < 0)
         {
-            LOG_DEBUG("Character '%c' not found in pattern for font %s", text[i], font_name);
-            current_line_width = (cursor_x - start_x) + (float32)(char_w * c);
-            cursor_x += (float32)((char_w + space_between_letters) * c);
+            LOG_DEBUG("Character '%c' not found in pattern for font %s", ch, font->name);
+            l.current_line_width = (l.cursor_x - l.start_x) + glyph_w;
+            l.cursor_x += glyph_w + spacing;
+            l.line_start = false;
             continue;
         }
 
-        uint16 frame = (uint16)idx;
+        const PatternLetter *glyph = &font->pattern[idx];
+        const float32 cell_w = (font->size_of_case.x + glyph->size.y) * (float32)coeff;
 
-        cursor_x += (float32)(x_left * c);
-        if (!SpriteDraw(s, frame, cursor_x, cursor_y, c, 0, a))
+        l.cursor_x += glyph->size.x * (float32)coeff;
+        if (!SpriteDraw(sprite, (uint16)idx, l.cursor_x, l.cursor_y + (float32)(glyph->y_offset * coeff), coeff, 0,
+                        alpha))
         {
             all_drawn = false;
         }
 
-        current_line_width = (cursor_x - start_x) + (float32)(((int32)char_w + y_right) * c);
-        cursor_x += (float32)(((int32)char_w + y_right + space_between_letters) * c);
+        l.current_line_width = (l.cursor_x - l.start_x) + cell_w;
+        l.cursor_x += cell_w + spacing;
+        l.line_start = false;
     }
 
-    if (current_line_width > max_line_width)
-    {
-        max_line_width = current_line_width;
-    }
+    if (l.current_line_width > l.max_line_width)
+        l.max_line_width = l.current_line_width;
 
-    if (text[0] == '\0')
-    {
-        if (size_out_w)
-            *size_out_w = 0;
-        if (size_out_h)
-            *size_out_h = 0;
-    }
-    else
-    {
-        if (size_out_w)
-            *size_out_w = (int32)max_line_width;
-        if (size_out_h)
-            *size_out_h = (int32)((cursor_y - start_y) + line_height);
-    }
+    if (text[0] != '\0')
+        SetSizeOut(size_out, l.max_line_width, (l.cursor_y - l.start_y) + l.line_height);
 
     return all_drawn;
 }

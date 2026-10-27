@@ -1,4 +1,3 @@
-
 class Log {
     foreign static error(message)
     foreign static info(message)
@@ -8,5 +7,4 @@ class Log {
     static warn(message){
         warning(message)
     }
-
 }
