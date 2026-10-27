@@ -25,27 +25,17 @@ jobs:
           package-cache: true
           build-cache: true
           
-      - name: update xmake repo
+      - name: Update xmake repo
         run: xmake repo -u
 
-      - name: Install virtual display / renderer / audio
+      - name: Setup Virtual Display & Audio
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            xvfb \
-            libgl1-mesa-dri libglx-mesa0 libegl1 libgles2 mesa-vulkan-drivers \
-            pulseaudio pulseaudio-utils alsa-utils libasound2-plugins
-
-      - name: Start virtual audio device
-        run: |
-          export XDG_RUNTIME_DIR="${RUNNER_TEMP}/xdg"
-          mkdir -p "$XDG_RUNTIME_DIR" && chmod 700 "$XDG_RUNTIME_DIR"
-          pulseaudio --start --exit-idle-time=-1 --daemonize=yes
-          pactl load-module module-null-sink sink_name=virtual_sink \
-            sink_properties=device.description=VirtualSink
-          pactl set-default-sink virtual_sink
-          pactl info
-          echo "XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR" >> "$GITHUB_ENV"
+            xvfb libgl1-mesa-dri libglx-mesa0 libegl1 libgles2 mesa-vulkan-drivers pulseaudio
+          export XDG_RUNTIME_DIR=/tmp/pulse
+          mkdir -p $XDG_RUNTIME_DIR
+          pulseaudio --start --exit-idle-time=-1
 
       - name: Configure
         run: >

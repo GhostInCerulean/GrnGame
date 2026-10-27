@@ -10,7 +10,7 @@ static on_start() {
 }
 
 static on_update(dt) {
-    //Exit.engine_stop()
+    Exit.engine_stop()
 }
 static on_fixed_update(dt) {}
 static on_render() {
