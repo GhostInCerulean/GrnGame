@@ -34,19 +34,6 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             xvfb libgl1-mesa-dri libglx-mesa0 libegl1 libgles2 mesa-vulkan-drivers
 
-      - name: Setup Virtual Audio (PulseAudio + null sink)
-        run: |
-          sudo apt-get install -y --no-install-recommends pulseaudio pulseaudio-utils libpulse0
-          pulseaudio --start --exit-idle-time=-1 --log-target=stderr
-          for i in $(seq 1 10); do
-            pactl info > /dev/null 2>&1 && break
-            sleep 1
-          done
-          pactl load-module module-null-sink sink_name=virtual_speaker sink_properties=device.description=VirtualSpeaker
-          pactl set-default-sink virtual_speaker
-          pactl info
-          pactl list short sinks
-
       - name: Configure
         run: >
           xmake config --clean
