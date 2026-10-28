@@ -63,6 +63,11 @@ jobs:
         with:
           name: staging-folders
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.x
+
       - name: Install WiX v5
         shell: pwsh
         run: |
