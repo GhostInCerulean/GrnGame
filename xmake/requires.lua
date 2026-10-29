@@ -17,7 +17,11 @@ function setup_requires()
 
 	-- render + input
 	-- if we update sdl version we need to update android-build because its based on sdl build
-	add_requires("libsdl3 3.4.12", { configs = { shared = false, threads = true } })
+	if has_config("wasm_threads") then
+		add_requires("libsdl3 3.4.12", { configs = { shared = false, threads = true } })
+	else
+		add_requires("libsdl3 3.4.12", { configs = { shared = false, threads = false } })
+	end
 	add_requires("libsdl3_image", { configs = { shared = false } })
 
 	-- maths
