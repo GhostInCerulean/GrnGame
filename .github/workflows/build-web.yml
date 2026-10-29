@@ -12,6 +12,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v14
+
       - name: Setup xmake
         uses: xmake-io/github-action-setup-xmake@v1
         with:
@@ -24,10 +27,9 @@ jobs:
         run: xmake repo -u
 
       - name: clean xmake packages
-        run: xmake require -f libsdl3 libsdl3_image libsdl3_mixer klib cglm wren highway sqlite3 cjson freetype zlib tinydir haclog tracy -y
-        
-      - name: Setup emsdk
-        uses: mymindstorm/setup-emsdk@v14
+        run: |
+          rm -rf ~/.xmake/packages
+          rm -rf ~/.xmake/cache
 
       - name: Configure
         run: >
