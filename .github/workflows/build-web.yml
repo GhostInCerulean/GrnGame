@@ -26,17 +26,17 @@ jobs:
       - name: update xmake repo
         run: xmake repo -u
 
-      # - name: clean xmake packages
-      #   run: |
-      #     rm -rf ~/.xmake/packages
-      #     rm -rf ~/.xmake/cache
+      - name: clean xmake packages
+        run: |
+          rm -rf ~/.xmake/packages
+          rm -rf ~/.xmake/cache
 
       - name: Configure
         run: >
           xmake f -p wasm -c
           -y -vv
           --embed_assets=y
-          --wasm_threads=n
+          --wasm_threads=y
 
       - name: Build
         run: xmake build -y -vv
