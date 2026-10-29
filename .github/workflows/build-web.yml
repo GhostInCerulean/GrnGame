@@ -22,6 +22,9 @@ jobs:
 
       - name: update xmake repo
         run: xmake repo -u
+
+      - name: clean xmake packages
+        run: xmake require -f --all
         
       - name: Setup emsdk
         uses: mymindstorm/setup-emsdk@v14
@@ -31,6 +34,7 @@ jobs:
           xmake f -p wasm -c
           -y -vv
           --embed_assets=y
+          --wasm_threads=n
 
       - name: Build
         run: xmake build -y -vv
