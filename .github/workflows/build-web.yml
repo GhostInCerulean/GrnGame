@@ -26,10 +26,10 @@ jobs:
       - name: update xmake repo
         run: xmake repo -u
 
-      - name: clean xmake packages
-        run: |
-          rm -rf ~/.xmake/packages
-          rm -rf ~/.xmake/cache
+      # - name: clean xmake packages
+      #   run: |
+      #     rm -rf ~/.xmake/packages
+      #     rm -rf ~/.xmake/cache
 
       - name: Configure
         run: >
