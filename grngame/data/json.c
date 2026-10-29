@@ -151,7 +151,6 @@ bool OpenJsonObject(const char *path, uint64 min, uint64 max)
 
 bool OpenJsonObjectFromMemory(const char *path, const unsigned char *text, uint64 min, uint64 max)
 {
-#ifndef GRNGAME_WASM
     cJSON *json = cJSON_Parse((const char *)text);
     if (json == NULL)
     {
@@ -166,10 +165,6 @@ bool OpenJsonObjectFromMemory(const char *path, const unsigned char *text, uint6
     j->max = max;
     JsonObjectAdd(path, j);
     return true;
-#else
-    LOG_WARNING("Json isnt supported on the web");
-    return false;
-#endif
 }
 
 static cJSON *JsonNavigateToParent(cJSON *root, char *path_copy, char **out_leaf, bool create)
