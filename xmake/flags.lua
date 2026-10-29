@@ -27,6 +27,8 @@ function setup_global_flags()
 				"-pthread",
 				{ public = true, force = true }
 			)
+		else
+			add_defines("NO_THREADS_WASM", { public = true })
 		end
 	end
 

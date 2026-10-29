@@ -4,6 +4,7 @@
 #include <SDL3/SDL.h>
 #include <stdlib.h>
 
+#ifndef NO_THREADS_WASM
 static int32 ThreadPoolWorker(void *user_data)
 {
 #ifdef GRNGAME_DESKTOP
@@ -54,9 +55,15 @@ static int32 ThreadPoolWorker(void *user_data)
 
     return 0;
 }
+#endif
 
 COLD void ThreadManagerCreate(void)
 {
+#ifdef NO_THREADS_WASM
+    g_app.thread_manager = (ThreadManager){0};
+    LOG_DEBUG("Thread pool disabled");
+    return;
+#else
     int32 num_threads = SDL_GetNumLogicalCPUCores();
 
     if (num_threads < 1)
@@ -86,10 +93,15 @@ COLD void ThreadManagerCreate(void)
     }
 
     LOG_DEBUG("Pool created with %d threads", num_threads);
+#endif
 }
 
 COLD void ThreadManagerDestroy(ThreadManager *manager)
 {
+#ifdef NO_THREADS_WASM
+    (void)manager;
+    return;
+#else
     if (!manager || !manager->workers)
         return;
 
@@ -123,10 +135,14 @@ COLD void ThreadManagerDestroy(ThreadManager *manager)
     SDL_DestroyCondition(manager->wait_cond);
     SDL_DestroyCondition(manager->queue_cond);
     SDL_DestroyMutex(manager->mutex);
+#endif
 }
 
 void ThreadManagerPush(ThreadJobFunc func, void *data)
 {
+#ifdef NO_THREADS_WASM
+    func(data);
+#else
     ThreadManager *manager = &g_app.thread_manager;
 
     ThreadJobNode *job = malloc(sizeof(ThreadJobNode));
@@ -153,10 +169,14 @@ void ThreadManagerPush(ThreadJobFunc func, void *data)
     SDL_SignalCondition(manager->queue_cond);
 
     UNLOCK_MUTEX(manager->mutex);
+#endif
 }
 
 void ThreadManagerWait(void)
 {
+#ifdef NO_THREADS_WASM
+    return;
+#else
     ThreadManager *manager = &g_app.thread_manager;
 
     LOCK_MUTEX(manager->mutex);
@@ -167,4 +187,5 @@ void ThreadManagerWait(void)
     }
 
     UNLOCK_MUTEX(manager->mutex);
+#endif
 }
