@@ -416,12 +416,12 @@ InitResult InitAll(void)
     if (InitAppMetaData() != INIT_OK)
         return INIT_METADATA_FAILED;
 
-#if GRNGAME_WEB
+#if GRNGAME_WASM
     g_app.embedded_file_manager = EmbeddedFileManagerCreate();
-    if (!InstallGameData() || !InitAssetsPak() || !InitGameData())
+    if (!InitAssetsPak())
         return INIT_OPEN_GAME_DATA_FAILED;
 
-    if (!EmbeddedFileManagerLoadAssetsPak() || !EmbeddedFileManagerLoadGameData())
+    if (!EmbeddedFileManagerLoadAssetsPak())
         return INIT_OPEN_GAME_DATA_FAILED;
 #elif GRNGAME_EMBED_ASSETS
     g_app.embedded_file_manager = EmbeddedFileManagerCreate();

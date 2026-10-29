@@ -4,13 +4,15 @@ function setup_requires()
 	end
 
 	if is_plat("wasm") then
-		add_requireconfs("**", {
-			configs = {
-				cflags = { "-pthread", "-matomics", "-mbulk-memory" },
-				cxxflags = { "-pthread", "-matomics", "-mbulk-memory" },
-				ldflags = { "-pthread" },
-			},
-		})
+		if has_config("wasm_threads") then
+			add_requireconfs("**", {
+				configs = {
+					cflags = { "-pthread", "-matomics", "-mbulk-memory" },
+					cxxflags = { "-pthread", "-matomics", "-mbulk-memory" },
+					ldflags = { "-pthread" },
+				},
+			})
+		end
 	end
 
 	-- render + input

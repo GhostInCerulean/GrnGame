@@ -45,7 +45,12 @@ bool JsonExist(const char *key)
 
 bool JsonExistFromMemory(const char *key)
 {
+#ifndef GRNGAME_WASM
     return EmbeddedFileExists(key);
+#else
+    LOG_WARNING("Json isnt supported on the web");
+    return false;
+#endif
 }
 
 bool JsonCreate(const char *key, const char *text)
@@ -64,7 +69,7 @@ bool JsonCreate(const char *key, const char *text)
 }
 bool JsonCreateFromMemory(const char *key, const char *text)
 {
-
+#ifndef GRNGAME_WASM
     uint64 size = strlen(text);
     if (!EmbeddedFilePut(key, text, size))
     {
@@ -72,6 +77,10 @@ bool JsonCreateFromMemory(const char *key, const char *text)
         return false;
     }
     return true;
+#else
+    LOG_WARNING("Json isnt supported on the web");
+    return false;
+#endif
 }
 
 static void JsonObjectAdd(const char *key, JsonObject *value)
@@ -142,6 +151,7 @@ bool OpenJsonObject(const char *path, uint64 min, uint64 max)
 
 bool OpenJsonObjectFromMemory(const char *path, const unsigned char *text, uint64 min, uint64 max)
 {
+#ifndef GRNGAME_WASM
     cJSON *json = cJSON_Parse((const char *)text);
     if (json == NULL)
     {
@@ -156,6 +166,10 @@ bool OpenJsonObjectFromMemory(const char *path, const unsigned char *text, uint6
     j->max = max;
     JsonObjectAdd(path, j);
     return true;
+#else
+    LOG_WARNING("Json isnt supported on the web");
+    return false;
+#endif
 }
 
 static cJSON *JsonNavigateToParent(cJSON *root, char *path_copy, char **out_leaf, bool create)
@@ -343,6 +357,7 @@ bool JsonSaveObject(const char *fileKey)
 
 bool JsonSaveObjectFromMemory(const char *fileKey)
 {
+#ifndef GRNGAME_WASM
     JsonObject *entry = JsonObjectGet(fileKey);
     if (UNLIKELY(entry == NULL))
     {
@@ -357,6 +372,10 @@ bool JsonSaveObjectFromMemory(const char *fileKey)
     free(text);
 
     return result;
+#else
+    LOG_WARNING("Json isnt supported on the web");
+    return false;
+#endif
 }
 
 bool JsonGetBoolArray(const char *fileKey, const char *key, bool_vec_t *out)
@@ -509,6 +528,7 @@ void JsonSaveObjects(float64 budget)
 
 bool WriteInJsonObject(const char *key, cJSON *object)
 {
+#ifndef GRNGAME_WASM
     JsonObject *entry = JsonObjectGet(key);
     if (UNLIKELY(entry == NULL))
     {
@@ -519,4 +539,8 @@ bool WriteInJsonObject(const char *key, cJSON *object)
     entry->json = NULL;
     entry->json = object;
     return true;
+#else
+    LOG_WARNING("Json isnt supported on the web");
+    return false;
+#endif
 }

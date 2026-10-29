@@ -196,7 +196,9 @@ static void UpdateEngineTime(float64 frame_start_time)
     if (frame_elapsed_time < target_frame_time)
     {
         float64 remaining_time = target_frame_time - frame_elapsed_time;
+#ifndef GRNGAME_WASM
         JsonSaveObjects(remaining_time);
+#endif
         frame_elapsed_time = TimeNow() - frame_start_time;
 
         if (frame_elapsed_time < target_frame_time)

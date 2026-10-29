@@ -18,4 +18,5 @@ function setup_options()
 	bool_option("software_renderer", false, "set renderer on software")
 	bool_option("pixel_int_position", true, "allow only int positions for textures and sprites")
 	bool_option("big_buffer", false, "set every stack buffer bigger x5")
+	bool_option("wasm_threads", false, "set multithreads for wasm")
 end

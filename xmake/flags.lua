@@ -19,10 +19,15 @@ function setup_global_flags()
 			"-sASYNCIFY",
 			"-sINITIAL_MEMORY=512MB",
 			"-sALLOW_MEMORY_GROWTH=1",
-			"-sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency",
-			"-pthread",
 			{ public = true, force = true }
 		)
+		if has_config("wasm_threads") then
+			add_ldflags(
+				"-sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency",
+				"-pthread",
+				{ public = true, force = true }
+			)
+		end
 	end
 
 	if is_plat("linux") then
