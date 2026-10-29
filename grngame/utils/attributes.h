@@ -95,10 +95,10 @@
 /* STACK_ALLOC : stack allocation */
 #ifdef _MSC_VER
 #include <malloc.h>
-#define STACK_ALLOC(type, n) ((type *)_alloca(sizeof(type) * (n) * BUFFER_SPACE))
+#define STACK_ALLOC(type, n) ((type *)_alloca(sizeof(type) * (n)))
 #else
 #include <alloca.h>
-#define STACK_ALLOC(type, n) ((type *)alloca(sizeof(type) * (n) * BUFFER_SPACE))
+#define STACK_ALLOC(type, n) ((type *)alloca(sizeof(type) * (n)))
 #endif
 
 #if defined(_MSC_VER)

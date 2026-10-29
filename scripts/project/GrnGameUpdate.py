@@ -1,6 +1,9 @@
 import shutil
 from pathlib import Path
 
+
+#dont update dist folder 
+
 PROJECT_MODEL_DIR = Path(__file__).resolve().parent.parent / "project_model"
 
 DATA_DIR = Path("data")

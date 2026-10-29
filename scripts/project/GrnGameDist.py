@@ -26,6 +26,7 @@ PLATFORMS = [
 SERVER_FILES = [
     "server.py",
     "index.html",
+    "logo.png",
     "Runtime-wasm-wasm32-releaseembedded.js",
     "Runtime-wasm-wasm32-releaseembedded.wasm",
 ]

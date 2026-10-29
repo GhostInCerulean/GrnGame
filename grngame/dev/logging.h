@@ -33,7 +33,7 @@
 #define GRN_OSLOG(fn, fmt, ...)                                                                                        \
     do                                                                                                                 \
     {                                                                                                                  \
-        char grn_log_buf_[512 * BUFFER_SPACE];                                                                         \
+        char grn_log_buf_[512];                                                                                        \
         snprintf(grn_log_buf_, sizeof(grn_log_buf_), fmt, ##__VA_ARGS__);                                              \
         fn(OS_LOG_DEFAULT, "GrnGame: %{public}s", grn_log_buf_);                                                       \
     } while (0)
