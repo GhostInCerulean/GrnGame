@@ -24,7 +24,7 @@ jobs:
         run: xmake repo -u
 
       - name: clean xmake packages
-        run: xmake require -f libsdl3 libsdl3_image libsdl3_mixer klib cglm wren highway sqlite3 cjson freetype zlib tinydir haclog tracy
+        run: xmake require -f libsdl3 libsdl3_image libsdl3_mixer klib cglm wren highway sqlite3 cjson freetype zlib tinydir haclog tracy -y
         
       - name: Setup emsdk
         uses: mymindstorm/setup-emsdk@v14
