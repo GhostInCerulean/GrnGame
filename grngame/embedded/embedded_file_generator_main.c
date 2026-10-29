@@ -1,4 +1,5 @@
 #include "embedded_file_generator.h"
+#include "grngame/utils/memory.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +22,7 @@ static bool ReadVersion(char *out, size_t size)
     FILE *pipe = popen("python read_metadata.py", "r");
     if (!pipe)
         return false;
-    char line[256];
+    char line[256 * BUFFER_SPACE];
     int line_index = 0;
     bool found = false;
     while (fgets(line, sizeof(line), pipe))
@@ -41,7 +42,7 @@ static bool ReadVersion(char *out, size_t size)
 
 int main(int argc, char **argv)
 {
-    char version[64] = {0};
+    char version[64 * BUFFER_SPACE] = {0};
     if (!ReadVersion(version, sizeof(version)))
     {
         fprintf(stderr, "Cannot read version from metadata.json\n");

@@ -128,7 +128,7 @@ static bool LoadRow(DbRow *row, EmbedKind kind)
 
 static bool LoadTableFrom(sqlite3 *db, const char *label, EmbedKind kind)
 {
-    char sql[128];
+    char sql[128 * BUFFER_SPACE];
     snprintf(sql, sizeof(sql), "SELECT path, content FROM %s;", EmbedKindTable(kind));
 
     bool success;
@@ -148,7 +148,7 @@ static bool LoadTableFrom(sqlite3 *db, const char *label, EmbedKind kind)
 
 static bool AssetsPakTableExists(const char *name)
 {
-    char sql[256];
+    char sql[256 * BUFFER_SPACE];
     snprintf(sql, sizeof(sql),
              "SELECT 1 FROM sqlite_master "
              "WHERE type = 'table' AND name = '%s' LIMIT 1;",
@@ -240,7 +240,7 @@ static bool GameDataExec(const char *sql, DbArg *args, int32 arg_count)
 
 static bool GameDataDbWrite(const char *path, const void *data, uint64 size)
 {
-    char sql[255];
+    char sql[255 * BUFFER_SPACE];
     snprintf(sql, sizeof(sql),
              "INSERT INTO %s (path, content) VALUES (?, ?) "
              "ON CONFLICT(path) DO UPDATE SET content = excluded.content;",
@@ -255,7 +255,7 @@ static bool GameDataDbWrite(const char *path, const void *data, uint64 size)
 
 static bool GameDataDbDelete(const char *path)
 {
-    char sql[128];
+    char sql[128 * BUFFER_SPACE];
     snprintf(sql, sizeof(sql), "DELETE FROM %s WHERE path = ?;", EmbedKindTable(GAME_DATA_KIND));
 
     DbArg arg = {.name = NULL, .type = TEXT, .value.s = path};

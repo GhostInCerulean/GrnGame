@@ -3,6 +3,7 @@
 #include "grngame/data/sqlite.h"
 #include "grngame/dev/logging.h"
 #include "grngame/platform/paths.h"
+#include "grngame/utils/memory.h"
 #include "grngame/utils/string_compat.h"
 #include "grngame/utils/version.h"
 #include <SDL3/SDL.h>
@@ -47,9 +48,9 @@ static AssetsPakDecision DecideAssetsPakAction(const char *installed_path, const
     if (bundled_version > installed_version)
     {
         // parse should work
-        char old[128];
+        char old[128 * BUFFER_SPACE];
         ParseVersionToString(installed_version, old, sizeof(old));
-        char new[128];
+        char new[128 * BUFFER_SPACE];
         ParseVersionToString(installed_version, new, sizeof(new));
 
         LOG_DEBUG("Changing assets.pak version from %s to %s", old, new);
@@ -165,7 +166,7 @@ static bool DetectGameDataVersionChange(const char *path)
 
     if (version_changed)
     {
-        char stored_str[64];
+        char stored_str[64 * BUFFER_SPACE];
         if (!ParseVersionToString(stored_version, stored_str, sizeof(stored_str)))
         {
             LOG_ERROR("Cannot read game.data version");

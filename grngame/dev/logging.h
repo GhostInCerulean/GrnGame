@@ -1,6 +1,7 @@
 #pragma once
 
 #include "grngame/utils/c_cpp.h"
+#include "grngame/utils/memory.h"
 
 #include <stdbool.h>
 
@@ -32,7 +33,7 @@
 #define GRN_OSLOG(fn, fmt, ...)                                                                                        \
     do                                                                                                                 \
     {                                                                                                                  \
-        char grn_log_buf_[512];                                                                                        \
+        char grn_log_buf_[512 * BUFFER_SPACE];                                                                         \
         snprintf(grn_log_buf_, sizeof(grn_log_buf_), fmt, ##__VA_ARGS__);                                              \
         fn(OS_LOG_DEFAULT, "GrnGame: %{public}s", grn_log_buf_);                                                       \
     } while (0)

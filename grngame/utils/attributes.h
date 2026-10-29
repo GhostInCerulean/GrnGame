@@ -1,5 +1,7 @@
 #pragma once
 
+#include "grngame/utils/memory.h"
+
 #include "grngame/dev/logging.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,10 +95,10 @@
 /* STACK_ALLOC : stack allocation */
 #ifdef _MSC_VER
 #include <malloc.h>
-#define STACK_ALLOC(type, n) ((type *)_alloca(sizeof(type) * (n)))
+#define STACK_ALLOC(type, n) ((type *)_alloca(sizeof(type) * (n) * BUFFER_SPACE))
 #else
 #include <alloca.h>
-#define STACK_ALLOC(type, n) ((type *)alloca(sizeof(type) * (n)))
+#define STACK_ALLOC(type, n) ((type *)alloca(sizeof(type) * (n) * BUFFER_SPACE))
 #endif
 
 #if defined(_MSC_VER)

@@ -4,6 +4,7 @@
 #include "grngame/dev/logging.h"
 #include "grngame/math/types.h"
 #include "grngame/utils/attributes.h"
+#include "grngame/utils/memory.h"
 #include "grngame/utils/version.h"
 #include "kvec.h"
 #include <SDL3/SDL.h>
@@ -324,7 +325,7 @@ bool ApplyDbVersion(sqlite3 *db, const char *version)
         fprintf(stdout, "Format version is incorrect please use major.minor.fix");
         return false;
     }
-    char sql[64];
+    char sql[64 * BUFFER_SPACE];
     snprintf(sql, sizeof(sql), "PRAGMA user_version = %d;", ver);
     if (!DataWrite(db, sql))
     {

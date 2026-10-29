@@ -12,6 +12,7 @@
 
 #include "grngame/data/sqlite.h"
 #include "grngame/utils/attributes.h"
+#include "grngame/utils/memory.h"
 #include "grngame/utils/version.h"
 #include "sqlite3.h"
 
@@ -45,7 +46,7 @@ static sqlite3 *OpenFreshEmbeddedDb(const char *output_path)
 
 static void CreateEmbedSchema(sqlite3 *db)
 {
-    char sql[256];
+    char sql[256 * BUFFER_SPACE];
 
     for (int32 i = 0; i < EMBED_KIND_COUNT; ++i)
     {
@@ -57,7 +58,7 @@ static void CreateEmbedSchema(sqlite3 *db)
 
 static bool PrepareEmbedStatements(sqlite3 *db, EmbedContext *ctx)
 {
-    char sql[128];
+    char sql[128 * BUFFER_SPACE];
     bool success;
     for (int32 i = 0; i < EMBED_KIND_COUNT; ++i)
     {
