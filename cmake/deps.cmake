@@ -112,12 +112,11 @@ if (sqlite3_ADDED AND NOT TARGET sqlite3)
 endif ()
 
 CPMAddPackage(
-        NAME cjson
-        GITHUB_REPOSITORY DaveGamble/cJSON
-        GIT_TAG 6d9f2443ab071f86e5d9b43025a40929ec41c46c
+        NAME yyjson
+        GITHUB_REPOSITORY ibireme/yyjson
+        GIT_TAG 0.13.0
         OPTIONS
-        "ENABLE_CJSON_TEST OFF" "ENABLE_CJSON_UNINSTALL OFF"
-        "CJSON_BUILD_SHARED_LIBS OFF" "ENABLE_CJSON_UTILS OFF"
+            "YYJSON_INSTALL OFF"
 )
 
 if (IS_DEV)

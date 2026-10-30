@@ -104,7 +104,7 @@ target_link_libraries(grngame PUBLIC
         freetype
         sqlite3
         hwy
-        cjson
+        yyjson
 )
 
 if (IS_DESKTOP)
@@ -215,3 +215,21 @@ else ()
     # endif ()
 endif ()
 target_link_libraries(Runtime PRIVATE grngame)
+
+# cross platform symbols
+include(CheckSymbolExists)
+
+# string compat
+check_symbol_exists(strdup        "string.h"  HAVE_STRDUP)
+check_symbol_exists(strcasecmp    "strings.h" HAVE_STRCASECMP)
+check_symbol_exists(_stricmp      "string.h"  HAVE__STRICMP)
+check_symbol_exists(_strdup       "string.h"  HAVE__STRDUP)
+check_symbol_exists(strtok_r      "string.h"  HAVE_STRTOK_R)
+
+target_compile_definitions(grngame PRIVATE
+        $<$<BOOL:${HAVE_STRDUP}>:HAVE_STRDUP>
+        $<$<BOOL:${HAVE_STRCASECMP}>:HAVE_STRCASECMP>
+        $<$<BOOL:${HAVE__STRICMP}>:HAVE__STRICMP>
+        $<$<BOOL:${HAVE__STRDUP}>:HAVE__STRDUP>
+        $<$<BOOL:${HAVE_STRTOK_R}>:HAVE_STRTOK_R>
+)
