@@ -39,7 +39,7 @@ CPMAddPackage(
 CPMAddPackage(
         NAME SDL3_mixer
         GITHUB_REPOSITORY libsdl-org/SDL_mixer
-        GIT_TAG main            # pin to a release tag when available
+        GIT_TAG release-3.2.4
         OPTIONS
         "BUILD_SHARED_LIBS OFF"
         "SDLMIXER_VENDORED ON"
@@ -50,7 +50,7 @@ CPMAddPackage(
 CPMAddPackage(
         NAME freetype
         GITHUB_REPOSITORY freetype/freetype
-        GIT_TAG VER-2-13-3
+        GIT_TAG VER-2-15-0
         OPTIONS
         "FT_DISABLE_ZLIB ON" "FT_DISABLE_BZIP2 ON" "FT_DISABLE_PNG ON"
         "FT_DISABLE_HARFBUZZ ON" "FT_DISABLE_BROTLI ON"
@@ -59,7 +59,7 @@ CPMAddPackage(
 CPMAddPackage(
         NAME klib
         GITHUB_REPOSITORY attractivechaos/klib
-        GIT_TAG master
+        GIT_TAG 97a0fcb790b43b9e5da8994f4671021fec036f19
         DOWNLOAD_ONLY YES
 )
 if(klib_ADDED AND NOT TARGET klib)
@@ -70,7 +70,7 @@ endif()
 CPMAddPackage(
         NAME cglm
         GITHUB_REPOSITORY recp/cglm
-        GIT_TAG v0.9.4
+        GIT_TAG v0.9.7
         OPTIONS "CGLM_STATIC ON" "CGLM_SHARED OFF" "CGLM_USE_TEST OFF"
 )
 
@@ -91,18 +91,16 @@ if(wren_ADDED AND NOT TARGET wren)
             "${wren_SOURCE_DIR}/src/optional")
 endif()
 
-# ---- simd ----
 CPMAddPackage(
         NAME highway
         GITHUB_REPOSITORY google/highway
-        GIT_TAG 1.2.0
+        GIT_TAG 1.4.0
         OPTIONS
         "HWY_ENABLE_TESTS OFF" "HWY_ENABLE_EXAMPLES OFF"
         "HWY_ENABLE_CONTRIB OFF" "HWY_ENABLE_INSTALL OFF"
 )
 
-# ---- files ----
-# sqlite3: build the amalgamation (system = false)
+# build the amalgamation
 CPMAddPackage(
         NAME sqlite3
         URL https://www.sqlite.org/2025/sqlite-amalgamation-3500400.zip
@@ -122,10 +120,7 @@ CPMAddPackage(
         "CJSON_BUILD_SHARED_LIBS OFF" "ENABLE_CJSON_UTILS OFF"
 )
 
-is_dev_mode(is_dev)
-is_desktop_platform(is_desktop)
-
-if(is_dev)
+if(IS_DEV)
     CPMAddPackage(
             NAME tinydir
             GITHUB_REPOSITORY cxong/tinydir
@@ -138,12 +133,10 @@ if(is_dev)
     endif()
 endif()
 
-if(is_desktop)
-    # xmake: "haclog add_colors_options" -> check haclog's CMake options for the
-    # equivalent of add_colors_options and set it in OPTIONS below.
+if(IS_DESKTOP)
     CPMAddPackage(
             NAME haclog
-            GITHUB_REPOSITORY baptistegrn/haclog   # <- fill in
+            GITHUB_REPOSITORY baptistegrn/haclog
             GIT_TAG d801a48bc434a79813f0ee246a3c486dfe9a2ca1
             OPTIONS "BUILD_SHARED_LIBS OFF"
     )
