@@ -62,10 +62,10 @@ CPMAddPackage(
         GIT_TAG 97a0fcb790b43b9e5da8994f4671021fec036f19
         DOWNLOAD_ONLY YES
 )
-if(klib_ADDED AND NOT TARGET klib)
+if (klib_ADDED AND NOT TARGET klib)
     add_library(klib INTERFACE)
     target_include_directories(klib INTERFACE "${klib_SOURCE_DIR}")
-endif()
+endif ()
 
 CPMAddPackage(
         NAME cglm
@@ -80,7 +80,7 @@ CPMAddPackage(
         GIT_TAG d18db2cffa5ba76e482d980c3f7bab143c077c2b
         DOWNLOAD_ONLY YES
 )
-if(wren_ADDED AND NOT TARGET wren)
+if (wren_ADDED AND NOT TARGET wren)
     file(GLOB _wren_src
             "${wren_SOURCE_DIR}/src/vm/*.c"
             "${wren_SOURCE_DIR}/src/optional/*.c")
@@ -89,7 +89,7 @@ if(wren_ADDED AND NOT TARGET wren)
             "${wren_SOURCE_DIR}/src/include"
             "${wren_SOURCE_DIR}/src/vm"
             "${wren_SOURCE_DIR}/src/optional")
-endif()
+endif ()
 
 CPMAddPackage(
         NAME highway
@@ -106,10 +106,10 @@ CPMAddPackage(
         URL https://www.sqlite.org/2025/sqlite-amalgamation-3500400.zip
         DOWNLOAD_ONLY YES
 )
-if(sqlite3_ADDED AND NOT TARGET sqlite3)
+if (sqlite3_ADDED AND NOT TARGET sqlite3)
     add_library(sqlite3 STATIC "${sqlite3_SOURCE_DIR}/sqlite3.c")
     target_include_directories(sqlite3 PUBLIC "${sqlite3_SOURCE_DIR}")
-endif()
+endif ()
 
 CPMAddPackage(
         NAME cjson
@@ -120,24 +120,24 @@ CPMAddPackage(
         "CJSON_BUILD_SHARED_LIBS OFF" "ENABLE_CJSON_UTILS OFF"
 )
 
-if(IS_DEV)
+if (IS_DEV)
     CPMAddPackage(
             NAME tinydir
             GITHUB_REPOSITORY cxong/tinydir
             GIT_TAG 1.2.6
             DOWNLOAD_ONLY YES
     )
-    if(tinydir_ADDED AND NOT TARGET tinydir)
+    if (tinydir_ADDED AND NOT TARGET tinydir)
         add_library(tinydir INTERFACE)
         target_include_directories(tinydir INTERFACE "${tinydir_SOURCE_DIR}")
-    endif()
-endif()
+    endif ()
+endif ()
 
-if(IS_DESKTOP)
+if (IS_DESKTOP)
     CPMAddPackage(
             NAME haclog
             GITHUB_REPOSITORY baptistegrn/haclog
             GIT_TAG d801a48bc434a79813f0ee246a3c486dfe9a2ca1
             OPTIONS "BUILD_SHARED_LIBS OFF"
     )
-endif()
+endif ()
