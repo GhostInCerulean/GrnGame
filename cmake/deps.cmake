@@ -3,17 +3,17 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 if (GRNGAME_TRACY)
     CPMAddPackage(
             NAME tracy
-            GITHUB_REPOSITORY wolfpld/tracy
-            GIT_TAG v0.11.1
+            URL https://github.com/wolfpld/tracy/archive/refs/tags/v0.11.1.tar.gz
             OPTIONS "TRACY_ENABLE ON" "TRACY_ON_DEMAND ON"
     )
 endif ()
 
 
+# SDL, SDL_image and SDL_mixer use the official release assets:
+# the auto-generated GitHub archives omit the vendored submodules.
 CPMAddPackage(
         NAME SDL3
-        GITHUB_REPOSITORY libsdl-org/SDL
-        GIT_TAG release-3.4.12
+        URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.12/SDL3-3.4.12.tar.gz
         OPTIONS
         "SDL_SHARED OFF"
         "SDL_STATIC ON"
@@ -26,6 +26,7 @@ CPMAddPackage(
         NAME SDL3_image
         GITHUB_REPOSITORY libsdl-org/SDL_image
         GIT_TAG release-3.2.4
+        GIT_SHALLOW TRUE
         OPTIONS
         "BUILD_SHARED_LIBS OFF"
         "SDLIMAGE_VENDORED ON"
@@ -40,6 +41,7 @@ CPMAddPackage(
         NAME SDL3_mixer
         GITHUB_REPOSITORY libsdl-org/SDL_mixer
         GIT_TAG release-3.2.4
+        GIT_SHALLOW TRUE
         OPTIONS
         "BUILD_SHARED_LIBS OFF"
         "SDLMIXER_VENDORED ON"
@@ -49,8 +51,7 @@ CPMAddPackage(
 
 CPMAddPackage(
         NAME freetype
-        GITHUB_REPOSITORY freetype/freetype
-        GIT_TAG VER-2-15-0
+        URL https://github.com/freetype/freetype/archive/refs/tags/VER-2-15-0.tar.gz
         OPTIONS
         "FT_DISABLE_ZLIB ON" "FT_DISABLE_BZIP2 ON" "FT_DISABLE_PNG ON"
         "FT_DISABLE_HARFBUZZ ON" "FT_DISABLE_BROTLI ON"
@@ -58,8 +59,7 @@ CPMAddPackage(
 
 CPMAddPackage(
         NAME klib
-        GITHUB_REPOSITORY attractivechaos/klib
-        GIT_TAG 97a0fcb790b43b9e5da8994f4671021fec036f19
+        URL https://github.com/attractivechaos/klib/archive/97a0fcb790b43b9e5da8994f4671021fec036f19.tar.gz
         DOWNLOAD_ONLY YES
 )
 if (klib_ADDED AND NOT TARGET klib)
@@ -69,15 +69,13 @@ endif ()
 
 CPMAddPackage(
         NAME cglm
-        GITHUB_REPOSITORY recp/cglm
-        GIT_TAG v0.9.7
+        URL https://github.com/recp/cglm/archive/refs/tags/v0.9.7.tar.gz
         OPTIONS "CGLM_STATIC ON" "CGLM_SHARED OFF" "CGLM_USE_TEST OFF"
 )
 
 CPMAddPackage(
         NAME wren
-        GITHUB_REPOSITORY Baptistegrn/wren   # <- replace with your fork if "Map-api" lives there
-        GIT_TAG d18db2cffa5ba76e482d980c3f7bab143c077c2b
+        URL https://github.com/Baptistegrn/wren/archive/d18db2cffa5ba76e482d980c3f7bab143c077c2b.tar.gz   # <- replace with your fork if "Map-api" lives there
         DOWNLOAD_ONLY YES
 )
 if (wren_ADDED AND NOT TARGET wren)
@@ -93,8 +91,7 @@ endif ()
 
 CPMAddPackage(
         NAME highway
-        GITHUB_REPOSITORY google/highway
-        GIT_TAG 1.4.0
+        URL https://github.com/google/highway/archive/refs/tags/1.4.0.tar.gz
         OPTIONS
         "HWY_ENABLE_TESTS OFF" "HWY_ENABLE_EXAMPLES OFF"
         "HWY_ENABLE_CONTRIB OFF" "HWY_ENABLE_INSTALL OFF"
@@ -113,17 +110,15 @@ endif ()
 
 CPMAddPackage(
         NAME yyjson
-        GITHUB_REPOSITORY ibireme/yyjson
-        GIT_TAG 0.13.0
+        URL https://github.com/ibireme/yyjson/archive/refs/tags/0.13.0.tar.gz
         OPTIONS
-            "YYJSON_INSTALL OFF"
+        "YYJSON_INSTALL OFF"
 )
 
 if (IS_DEV)
     CPMAddPackage(
             NAME tinydir
-            GITHUB_REPOSITORY cxong/tinydir
-            GIT_TAG 1.2.6
+            URL https://github.com/cxong/tinydir/archive/refs/tags/1.2.6.tar.gz
             DOWNLOAD_ONLY YES
     )
     if (tinydir_ADDED AND NOT TARGET tinydir)
@@ -135,8 +130,7 @@ endif ()
 if (IS_DESKTOP)
     CPMAddPackage(
             NAME haclog
-            GITHUB_REPOSITORY baptistegrn/haclog
-            GIT_TAG d801a48bc434a79813f0ee246a3c486dfe9a2ca1
+            URL https://github.com/baptistegrn/haclog/archive/d801a48bc434a79813f0ee246a3c486dfe9a2ca1.tar.gz
             OPTIONS "BUILD_SHARED_LIBS OFF"
     )
 endif ()

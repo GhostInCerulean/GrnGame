@@ -33,6 +33,15 @@ if (EMSCRIPTEN AND GRNGAME_WASM_THREADS)
     add_link_options(-pthread)
 endif ()
 
+# cache CPM packages
+if (CMAKE_HOST_WIN32)
+    set(_cpm_home "$ENV{USERPROFILE}")
+else ()
+    set(_cpm_home "$ENV{HOME}")
+endif ()
+if (_cpm_home)
+    set(CPM_SOURCE_CACHE "${_cpm_home}/.cache/CPM" CACHE PATH "CPM source cache")
+endif ()
 include(cmake/CPM.cmake)
 include(cmake/platform.cmake) # defines IS_DESKTOP / IS_DEV
 include(cmake/deps.cmake)
@@ -232,4 +241,11 @@ target_compile_definitions(grngame PRIVATE
         $<$<BOOL:${HAVE__STRICMP}>:HAVE__STRICMP>
         $<$<BOOL:${HAVE__STRDUP}>:HAVE__STRDUP>
         $<$<BOOL:${HAVE_STRTOK_R}>:HAVE_STRTOK_R>
+)
+
+# tests
+include(cmake/tests.cmake)
+grn_setup_tests(
+        TARGET_TESTS json pad_event engine_work sound version draw_text
+        AUTO_TESTS   engine_work
 )
