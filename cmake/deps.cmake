@@ -1,4 +1,5 @@
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(FETCHCONTENT_QUIET OFF)
 
 if (GRNGAME_TRACY)
     CPMAddPackage(
@@ -24,29 +25,28 @@ CPMAddPackage(
 
 CPMAddPackage(
         NAME SDL3_image
-        GITHUB_REPOSITORY libsdl-org/SDL_image
-        GIT_TAG release-3.2.4
-        GIT_SHALLOW TRUE
+        URL https://github.com/libsdl-org/SDL_image/releases/download/release-3.2.4/SDL3_image-3.2.4.tar.gz
         OPTIONS
-        "BUILD_SHARED_LIBS OFF"
-        "SDLIMAGE_VENDORED ON"
+        "SDLIMAGE_VENDORED OFF"
         "SDLIMAGE_SAMPLES OFF"
         "SDLIMAGE_INSTALL OFF"
         "SDLIMAGE_AVIF OFF"
         "SDLIMAGE_JXL OFF"
         "SDLIMAGE_TIF OFF"
+        "SDLIMAGE_WEBP OFF"
 )
 
 CPMAddPackage(
         NAME SDL3_mixer
-        GITHUB_REPOSITORY libsdl-org/SDL_mixer
-        GIT_TAG release-3.2.4
-        GIT_SHALLOW TRUE
+        URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-3.2.4/SDL3_mixer-3.2.4.tar.gz
         OPTIONS
-        "BUILD_SHARED_LIBS OFF"
-        "SDLMIXER_VENDORED ON"
-        "SDLMIXER_SAMPLES OFF"
-        "SDLMIXER_INSTALL OFF"
+        "SDLMIXER_VENDORED OFF"
+        "SDLMIXER_FLAC OFF"
+        "SDLMIXER_OPUS OFF"
+        "SDLMIXER_MOD OFF"
+        "SDLMIXER_MIDI OFF"
+        "SDLMIXER_GME OFF"
+        "SDLMIXER_WAVPACK OFF"
 )
 
 CPMAddPackage(
