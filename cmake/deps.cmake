@@ -262,7 +262,7 @@ CPMAddPackage(
         "BUILD_TESTING OFF"
         "DAS_ENABLE_PIC ON"
 
-        #no tierces libs
+        #no third party libs
         "DAS_SQLITE_DISABLED ON"
         "DAS_CRYPTO_DISABLED ON"
         "DAS_PUGIXML_DISABLED ON"
