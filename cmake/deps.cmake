@@ -131,8 +131,7 @@ if (IS_DEV)
 
     CPMAddPackage(
             NAME dmon
-            GITHUB_REPOSITORY septag/dmon
-            GIT_TAG 98364a4d1964d603075e5e2657cfbc6c3496c9c1 # dmon have no release dont forget to update commit
+            URL https://github.com/septag/dmon/archive/98364a4d1964d603075e5e2657cfbc6c3496c9c1.tar.gz # dmon has no release, don't forget to update the commit
             DOWNLOAD_ONLY YES
     )
     if (dmon_ADDED AND NOT TARGET dmon)
@@ -244,11 +243,16 @@ if (angelscript_ADDED AND NOT TARGET angelscript)
 endif ()
 
 set(DAS_MODULES_INCLUDE "" CACHE STRING "" FORCE)
+set(_das_patch "${CMAKE_SOURCE_DIR}/patches/dascript-ios-vm-read.patch")
+set(_das_patch_cmd "")
+if (APPLE)
+    set(_das_patch_cmd PATCH_COMMAND sh -c "git apply --check --reverse '${_das_patch}' 2>/dev/null || git apply '${_das_patch}'")
+endif ()
 CPMAddPackage(
         NAME daScript
-        GITHUB_REPOSITORY BorisBat/daScript
-        GIT_TAG v0.6.5
-        #no tests
+        URL https://github.com/BorisBat/daScript/archive/refs/tags/v0.6.5.tar.gz
+
+        ${_das_patch_cmd}
         EXCLUDE_FROM_ALL YES
         SYSTEM YES
 

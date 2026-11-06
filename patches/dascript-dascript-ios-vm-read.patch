@@ -1,0 +1,51 @@
+diff --git a/src/hal/project_specific_crash_handler.cpp b/src/hal/project_specific_crash_handler.cpp
+index d21d40f..4899d8b 100644
+--- a/src/hal/project_specific_crash_handler.cpp
++++ b/src/hal/project_specific_crash_handler.cpp
+@@ -140,26 +140,39 @@ static void * safe_read_ptr(uint64_t addr) {
+ 
+ #elif defined(__APPLE__) && !defined(__EMSCRIPTEN__)
+ 
++#include <TargetConditionals.h>
+ #include <mach/mach.h>
++#if TARGET_OS_IPHONE
++// iOS SDK: mach/mach_vm.h is an #error stub. Use the vm_* equivalents
++// (vm_address_t / vm_size_t are 64-bit on arm64, so semantics are identical).
++#include <mach/vm_map.h>
++typedef vm_size_t     das_vm_size_t;
++typedef vm_address_t  das_vm_address_t;
++#define das_vm_read_overwrite vm_read_overwrite
++#else
+ #include <mach/mach_vm.h>
++typedef mach_vm_size_t     das_vm_size_t;
++typedef mach_vm_address_t  das_vm_address_t;
++#define das_vm_read_overwrite mach_vm_read_overwrite
++#endif
+ 
+ // mach_vm_read_overwrite() handles unmapped/unreadable pages gracefully and
+ // is safe to call from a signal handler (it's a Mach trap, not a POSIX call).
+ static uint32_t safe_read_u32(uint64_t addr) {
+     uint32_t result = 0;
+-    mach_vm_size_t bytes_read = 0;
+-    mach_vm_read_overwrite(mach_task_self(),
+-        (mach_vm_address_t)addr, sizeof(uint32_t),
+-        (mach_vm_address_t)&result, &bytes_read);
++    das_vm_size_t bytes_read = 0;
++    das_vm_read_overwrite(mach_task_self(),
++        (das_vm_address_t)addr, sizeof(uint32_t),
++        (das_vm_address_t)&result, &bytes_read);
+     return (bytes_read == sizeof(uint32_t)) ? result : 0;
+ }
+ 
+ static void * safe_read_ptr(uint64_t addr) {
+     void * result = nullptr;
+-    mach_vm_size_t bytes_read = 0;
+-    mach_vm_read_overwrite(mach_task_self(),
+-        (mach_vm_address_t)addr, sizeof(void *),
+-        (mach_vm_address_t)&result, &bytes_read);
++    das_vm_size_t bytes_read = 0;
++    das_vm_read_overwrite(mach_task_self(),
++        (das_vm_address_t)addr, sizeof(void *),
++        (das_vm_address_t)&result, &bytes_read);
+     return (bytes_read == sizeof(void *)) ? result : nullptr;
+ }
