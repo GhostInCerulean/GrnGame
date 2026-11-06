@@ -59,7 +59,7 @@ bool FileIsLoadableScript(const char *file)
         return false;
 
     // null terminated so we can loop on it in the following loop
-    static const char *exts[] = {"wren", "das", NULL};
+    static const char *exts[] = {"as", NULL};
 
     // exts[i] will be false when it will reach NULL
     for (int32 i = 0; exts[i]; ++i)
@@ -155,6 +155,19 @@ char *PathFromExecutableDirectory(const char *relative)
     snprintf(buf, len, "%.*s/%s", (int32)exe_len, exe_dir, relative);
 
     return buf;
+#endif
+}
+
+char *PathFromAndroidStorage(const char *file)
+{
+#ifdef GRNGAME_ANDROID
+    const char *path = SDL_GetAndroidInternalStoragePath();
+    uint32 n = (uint32)strlen(path) + (uint32)strlen(file) + 2;
+    char *out = malloc(n);
+    snprintf(out, n, "%s/%s", path, file);
+    return out;
+#else
+    return strdup(file);
 #endif
 }
 

@@ -1,7 +1,7 @@
 #if defined(GRNGAME_HOT_RELOAD_ENABLE)
 #include "grngame/dev/hotreload.h"
 #include "grngame/assets/load.h"
-#include "grngame/bindings/wren/wren_api.h"
+#include "grngame/bindings/api/interpretor.h"
 #include "grngame/core/app.h"
 #include "grngame/dev/logging.h"
 #include "grngame/platform/paths.h"
@@ -12,7 +12,7 @@
 #include <string.h>
 
 #define DMON_IMPL
-#include "packages/d/dmon.h"
+#include "dmon.h"
 
 static void HotReloadInitQueue()
 {
@@ -97,7 +97,7 @@ void ProcessHotreloadQueue(void)
             if (FileIsLoadableScript(cpath))
             {
                 LOG_INFO("Detected new script '%s'", cpath);
-                if (!(ReloadWrenScript()))
+                if (!(BindingsReload("scripts/main.as")))
                     LOG_WARNING("Failed to reload script '%s'", cpath);
             }
 
@@ -131,7 +131,7 @@ void ProcessHotreloadQueue(void)
             if (FileIsLoadableScript(cpath))
             {
                 LOG_INFO("Detected deleted script '%s'", cpath);
-                if (!ReloadWrenScript())
+                if (!BindingsReload("scripts/main.as"))
                     LOG_WARNING("Failed to reload script '%s'", cpath);
             }
 
@@ -167,7 +167,7 @@ void ProcessHotreloadQueue(void)
             if (FileIsLoadableScript(cpath))
             {
                 LOG_INFO("Detected modified script '%s'", cpath);
-                if (!ReloadWrenScript())
+                if (!BindingsReload("scripts/main.as"))
                     LOG_WARNING("Failed to reload script '%s'", cpath);
             }
             // we can reload the config
@@ -233,7 +233,7 @@ void ProcessHotreloadQueue(void)
             if (FileIsLoadableScript(cpath))
             {
                 LOG_INFO("Detected moved script '%s'", cpath);
-                if (!ReloadWrenScript())
+                if (!BindingsReload("scripts/main.as"))
                     LOG_WARNING("Failed to reload script '%s'", cpath);
             }
 

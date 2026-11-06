@@ -2,8 +2,8 @@
 #include "data.h"
 #include "grngame/assets/asset_manager.h"
 #include "grngame/assets/embedded_file_manager.h"
-#include "grngame/bindings/wren/wren_api.h"
-#include "grngame/bindings/wren/wren_event.h"
+#include "grngame/bindings/api/callback.h"
+#include "grngame/bindings/api/interpretor.h"
 #include "grngame/core/app.h"
 #include "grngame/core/window.h"
 #include "grngame/data/file.h"
@@ -86,47 +86,6 @@ static InitResult SetSDLMetadata(void)
     return INIT_OK;
 }
 
-static bool ParseMetaData()
-{
-    JsonValue v = JsonReadValueFromDirectory(METADATA, "name");
-    if (v.type != JSONV_TEXT)
-    {
-        LOG_ERROR("Failed to read name section in %s", METADATA);
-        JsonValueFree(&v);
-        return false;
-    }
-    g_app.info.name = v.value.s;
-
-    v = JsonReadValueFromDirectory(METADATA, "version");
-    if (v.type != JSONV_TEXT)
-    {
-        LOG_ERROR("Failed to read version section in %s", METADATA);
-        JsonValueFree(&v);
-        return false;
-    }
-    g_app.info.version = v.value.s;
-
-    v = JsonReadValueFromDirectory(METADATA, "company");
-    if (v.type != JSONV_TEXT)
-    {
-        LOG_ERROR("Failed to read compagny section in %s", METADATA);
-        JsonValueFree(&v);
-        return false;
-    }
-    g_app.info.company = v.value.s;
-
-    return true;
-}
-
-// never embedded
-static InitResult InitAppMetaData()
-{
-    if (!ParseMetaData())
-        return INIT_METADATA_FAILED;
-
-    return INIT_OK;
-}
-
 static bool ReadConfigValue(const char *key, const unsigned char *memory, JsonValue *value, uint32 size)
 {
     *value =
@@ -197,9 +156,33 @@ static bool ParseConfig(const unsigned char *memory, uint32 size)
     g_app.info.enable_palette = value.value.b;
     JsonValueFree(&value);
 
+    if (!ReadConfigValue("name", memory, &value, size) || value.type != JSONV_TEXT)
+        goto invalid;
+    g_app.info.name = value.value.s;
+
     if (!ReadConfigValue("assetFolder", memory, &value, size) || value.type != JSONV_TEXT)
         goto invalid;
     g_app.info.asset_folder = value.value.s;
+
+    if (!ReadConfigValue("version", memory, &value, size) || value.type != JSONV_TEXT)
+        goto invalid;
+    g_app.info.version = value.value.s;
+
+    if (!ReadConfigValue("company", memory, &value, size) || value.type != JSONV_TEXT)
+        goto invalid;
+    g_app.info.company = value.value.s;
+
+    if (!ReadConfigValue("language", memory, &value, size) || value.type != JSONV_TEXT)
+        goto invalid;
+
+    if (strcmp("angelscript", value.value.s) == 0)
+    {
+        g_app.info.scripting_langage = ANGEL_SCRIPT;
+    }
+    else
+    {
+        LOG_WARNING("scripting language : %s is not supported set angelscript to default", value.value.s);
+    }
 
     if (!ReadConfigValue("palette", memory, &value, size) ||
         (value.type != JSONV_TEXT_ARRAY && value.type != JSONV_EMPTY_ARRAY))
@@ -295,9 +278,9 @@ static void LoadControllerMappings(void)
     LOG_INFO("Loaded %d controller mappings", mapped);
 }
 
-static void HandleWrenFailure(void)
+static void HandleBindingsFailure(void)
 {
-    SDL_Color red = {255, 0, 0, 255};
+    const SDL_Color red = {255, 0, 0, 255};
     RendererSetColor(red.r, red.g, red.b, red.a);
     SetTaskBarIconErrorProgress(100.0);
 }
@@ -358,21 +341,27 @@ void InitializeAssets(void)
 void InitializeScripts(void)
 {
 #ifndef GRNGAME_EMBED_ASSETS
-    if (!WrenInit())
+    if (!BindingsInit("scripts/main.as"))
     {
-        HandleWrenFailure();
+        HandleBindingsFailure();
         return;
     }
-
-    LOG_INFO("Wren runtime initialized successfully with script 'main.wren'");
+    if (g_app.info.scripting_langage == ANGEL_SCRIPT)
+        LOG_INFO("Angel runtime initialized successfully with script 'main.as'");
+    else
+    {
+    }
 #else
-    if (!WrenInitFromMemory())
+    if (!BindingsInitFromMemory("scripts/main.as"))
     {
-        HandleWrenFailure();
+        HandleBindingsFailure();
         return;
     }
-
-    LOG_INFO("Wren runtime initialized successfully with script 'main.wren'");
+    if (g_app.info.scripting_langage == ANGEL_SCRIPT)
+        LOG_INFO("Angel runtime initialized successfully with script 'main.as'");
+    else
+    {
+    }
 #endif
 }
 
@@ -388,27 +377,45 @@ InitResult InitAll(void)
 
     InitializeJson();
 
-    if (InitAppMetaData() != INIT_OK)
-        return INIT_METADATA_FAILED;
-
 #if GRNGAME_WASM
     g_app.embedded_file_manager = EmbeddedFileManagerCreate();
-    if (!InitAssetsPak())
-        return INIT_OPEN_GAME_DATA_FAILED;
-
     if (!EmbeddedFileManagerLoadAssetsPak())
         return INIT_OPEN_GAME_DATA_FAILED;
 #elif GRNGAME_EMBED_ASSETS
+#ifdef GRNGAME_ANDROID
     g_app.embedded_file_manager = EmbeddedFileManagerCreate();
-    if (!InstallAssetsPak() || !InstallGameData() || !InitAssetsPak() || !InitGameData())
+    char *storage = PathFromAndroidStorage("Assets.pak");
+    if (!MoveFile_(storage, ASSETS_PAK))
+    {
+        free(storage);
         return INIT_OPEN_GAME_DATA_FAILED;
-    if (!EmbeddedFileManagerLoadAssetsPak() || !EmbeddedFileManagerLoadGameData())
+    }
+
+    g_app.info.file_db = DbCreate(storage);
+    free(storage);
+#else
+    g_app.embedded_file_manager = EmbeddedFileManagerCreate();
+    g_app.info.file_db = DbCreate("Assets.pak");
+
+#endif
+
+    if (!EmbeddedFileManagerLoadAssetsPak())
         return INIT_OPEN_GAME_DATA_FAILED;
 #endif
 
     result = InitAppConfig();
     if (result != INIT_OK)
         return result;
+
+#ifdef GRNGAME_EMBED_ASSETS
+#ifndef GRNGAME_WASM
+    if (!InstallGameData() || !InitGameData())
+        return INIT_OPEN_GAME_DATA_FAILED;
+
+    if (!EmbeddedFileManagerLoadGameData())
+        return INIT_OPEN_GAME_DATA_FAILED;
+#endif
+#endif
 
     result = InitializeSDL();
     if (result != INIT_OK)
@@ -456,7 +463,7 @@ InitResult InitAll(void)
             {.type = CB_ARG_STRING, .as.string = g_app.info.version},
         };
 
-        CallWrenCallback(GAME_DATA_NEW_VERSION, args, 2);
+        BindingsCallBack(args, GAME_DATA_NEW_VERSION);
     }
 
     HotReloadInit(PathFromExecutableDirectory("."));

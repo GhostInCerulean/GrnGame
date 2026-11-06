@@ -4,7 +4,7 @@
 #include "SDL3/SDL_pixels.h"
 #include "grngame/assets/asset_manager.h"
 #include "grngame/audio/sound_manager.h"
-#include "grngame/bindings/wren/wren_api.h"
+#include "grngame/bindings/angelscript/api/interpretor.h"
 #include "grngame/core/text.h"
 #include "grngame/data/json.h"
 #include "grngame/data/sqlite.h"
@@ -20,22 +20,28 @@
 
 BEGIN_DECLARATIONS
 
-#define GARBAGE_COLLECTOR_TIME_TO_REFRESH 180
-
 #define FIXED_UPDATE_LOOP 30.0f
 
 #define FIXED_DT (1.0 / FIXED_UPDATE_LOOP)
+
+typedef enum
+{
+    ANGEL_SCRIPT,
+    DAS_SCRIPT,
+} SCRIPTING_LANGAGE;
 
 typedef struct AppInfo
 {
     sqlite3 *file_db;
     sqlite3 *data_db;
     bool update_event_data;
-    const char *name;
-    const char *company;
-    const char *version;
-    const char *old_version;
-    const char *asset_folder;
+    char *name;
+    char *company;
+    char *version;
+    char *old_version;
+    char *asset_folder;
+
+    SCRIPTING_LANGAGE scripting_langage;
 
     uint16 fps;
     float32 dt;
@@ -72,7 +78,7 @@ typedef struct
     AssetManager asset_manager;
     InputManager input_manager;
     JsonManager json_manager;
-    WrenManager wren_manager;
+    AngelManager angel_manager;
     EmbeddedFileManager embedded_file_manager;
     PaletteManager palette_manager;
     ThreadManager thread_manager;

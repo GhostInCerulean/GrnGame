@@ -4,9 +4,9 @@
 #include "SDL3/SDL_timer.h"
 #include "SDL3/SDL_video.h"
 #include "grngame/audio/sound.h"
-#include "grngame/bindings/wren/wren_api.h"
-
 #include "grngame/audio/sound_info.h"
+#include "grngame/bindings/api/callback.h"
+#include "grngame/bindings/api/interpretor.h"
 #include "grngame/core/app.h"
 #include "grngame/core/init.h"
 #include "grngame/core/text.h"
@@ -44,12 +44,11 @@ static HOT void MainLoopIteration(void *arg);
 static COLD void MainLoop(void);
 static COLD void EnsureInitSucceeded(InitResult res);
 
-static HOT void RunGarbageCollector(void);
 static HOT void RenderFrame(void);
 static COLD void InitializeLoopState(void);
 static COLD void CleanupAppResources(void);
 
-static COLD void EnsureInitSucceeded(InitResult res)
+static COLD void EnsureInitSucceeded(const InitResult res)
 {
     if (UNLIKELY(res == INIT_SDL_FAILED))
     {
@@ -89,8 +88,8 @@ static COLD void EnsureInitSucceeded(InitResult res)
 
 COLD void ShutdownScripts(void)
 {
-    WrenCallOnDestroy();
-    WrenFree();
+    BindingsCallOnDestroy();
+    BindingsFree();
 }
 
 void EngineStart()
@@ -98,9 +97,9 @@ void EngineStart()
     SetSeed();
     CheckAllTypes();
 
-    InitResult res = InitAll();
+    const InitResult res = InitAll();
     EnsureInitSucceeded(res);
-
+    BindingsCallOnStart();
     MainLoop();
 }
 
@@ -115,7 +114,7 @@ static void EngineStop(void)
     CleanupAppResources();
 }
 
-void EngineRequestStop(void)
+static void EngineRequestStop(void)
 {
     if (UNLIKELY(g_app.request_stop))
     {
@@ -165,13 +164,18 @@ static COLD void CleanupAppResources(void)
     HotReloadDestroy();
     LogDestroy();
     DbClose(g_app.info.file_db);
-    g_app = (App){0};
-}
+    DbClose(g_app.info.data_db);
 
-static HOT void RunGarbageCollector(void)
-{
-    if (UNLIKELY(g_app.info.frame_count % ((uint32)g_app.info.fps * GARBAGE_COLLECTOR_TIME_TO_REFRESH) == 0))
-        wrenCollectGarbage(g_app.wren_manager.vm);
+    // todo : factorise code
+    if (g_app.info.name)
+        free(g_app.info.name);
+    if (g_app.info.asset_folder)
+        free(g_app.info.asset_folder);
+    if (g_app.info.version)
+        free(g_app.info.version);
+    if (g_app.info.company)
+        free(g_app.info.company);
+    g_app = (App){0};
 }
 
 static HOT void RenderFrame(void)
@@ -182,17 +186,17 @@ static HOT void RenderFrame(void)
     PROFILE_ZONE_START(render_zone, "Render");
 
     RendererClear(&g_app.renderer);
-    WrenCallOnRender();
+    BindingsCallOnRender();
     ApplyBlackStripes();
     RendererPresent(&g_app.renderer);
 
     PROFILE_ZONE_END(render_zone);
 }
 
-static void UpdateEngineTime(float64 frame_start_time)
+static void UpdateEngineTime(const float64 frame_start_time)
 {
     float64 frame_elapsed_time = TimeNow() - frame_start_time;
-    float64 target_frame_time = 1.0 / (float64)g_app.info.fps;
+    const float64 target_frame_time = 1.0 / (float64)g_app.info.fps;
     if (frame_elapsed_time < target_frame_time)
     {
         float64 remaining_time = target_frame_time - frame_elapsed_time;
@@ -201,7 +205,7 @@ static void UpdateEngineTime(float64 frame_start_time)
 
         if (frame_elapsed_time < target_frame_time)
         {
-            float64 delay_sec = target_frame_time - frame_elapsed_time;
+            const float64 delay_sec = target_frame_time - frame_elapsed_time;
 
             SDL_Delay((uint32)(delay_sec * 1000.0));
         }
@@ -217,29 +221,20 @@ static HOT void MainLoopIteration(void *arg)
     if (!s_is_running)
         return;
 
-    PROFILE_FRAME_MARK();
-    PROFILE_ZONE_START(main_loop_work_zone, "MainLoop");
     float64 frame_start_time = TimeNow();
 
-    RunGarbageCollector();
     ProcessHotreloadQueue();
-    PROFILE_ZONE_START(poll_events_zone, "PollEvents");
     PollEvents();
-    PROFILE_ZONE_END(poll_events_zone);
 
-    PROFILE_ZONE_START(wren_update_zone, "Wren.OnUpdate");
-    WrenCallOnUpdate(g_app.info.dt);
-    PROFILE_ZONE_END(wren_update_zone);
+    BindingsCallOnUpdate(g_app.info.dt);
 
-    PROFILE_ZONE_START(wren_fixed_zone, "Wren.OnFixedUpdate");
-    WrenCallOnFixedUpdate(FIXED_DT);
-    PROFILE_ZONE_END(wren_fixed_zone);
+    // todo : call fixed update correctly
+    BindingsCallOnFixedUpdate(FIXED_DT);
 
     RenderFrame();
     ClearAll();
 
     g_app.info.frame_count++;
-    PROFILE_ZONE_END(main_loop_work_zone);
     UpdateEngineTime(frame_start_time);
 
     EngineRequestStop();

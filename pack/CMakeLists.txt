@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.15)
+project(GrnGamePackaging)
+
+file(TO_CMAKE_PATH "${STAGING_DIR}" STAGING_DIR_CMAKE)
+install(DIRECTORY "${STAGING_DIR_CMAKE}/" DESTINATION ".")
+
+set(CPACK_PACKAGE_NAME "GrnGame")
+set(CPACK_PACKAGE_VERSION "${GRNGAME_VERSION}")
+set(CPACK_PACKAGE_VENDOR "GrnGame")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A simple 2D pixel art platformer engine.")
+
+if (WIN32)
+    set(CPACK_GENERATOR "WIX;ZIP")
+    if ("${CPACK_SYSTEM_NAME}" MATCHES "arm64")
+        set(CPACK_WIX_ARCHITECTURE "arm64")
+    else ()
+        set(CPACK_WIX_ARCHITECTURE "x64")
+    endif ()
+elseif (UNIX AND NOT APPLE)
+    set(CPACK_GENERATOR "DEB;RPM;TGZ")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Baptiste Guerin baptiste.guerin34@gmail.com")
+    set(CPACK_RPM_PACKAGE_AUTOREQPROV "no")
+    set(CPACK_RPM_SPEC_MORE_DEFINE "%define __strip /bin/true")
+endif ()
+
+include(CPack)

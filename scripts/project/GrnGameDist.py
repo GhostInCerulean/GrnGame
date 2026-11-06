@@ -27,24 +27,23 @@ SERVER_FILES = [
     "server.py",
     "index.html",
     "logo.png",
-    "Runtime-wasm-wasm32-releaseembedded.js",
-    "Runtime-wasm-wasm32-releaseembedded.wasm",
+    "runtime-wasm.js",
+    "runtime-wasm.wasm",
 ]
 
 RUNTIME_BINARIES = {
-    "Runtime-linux-arm64-releaseembedded": "linux-arm64",
-    "Runtime-linux-x86_64-releaseembedded": "linux-x86_64",
-    "Runtime-macosx-arm64-releaseembedded": "macos-arm64",
-    "Runtime-macosx-x86_64-releaseembedded": "macos-x86_64",
-    "Runtime-windows-arm64-releaseembedded.exe": "windows-arm64",
-    "Runtime-windows-x64-releaseembedded.exe": "windows-x64",
-    "Runtime-iphoneos-arm64-releaseembedded": IOS_PLATFORM,
+    "runtime-linux-arm64": "linux-arm64",
+    "runtime-linux-x64": "linux-x86_64",
+    "runtime-macos-arm64": "macos-arm64",
+    "runtime-macos-x64": "macos-x86_64",
+    "runtime-windows-arm64.exe": "windows-arm64",
+    "runtime-windows-x64.exe": "windows-x64",
+    "runtime-ios-arm64": IOS_PLATFORM,
 }
 
 EMBEDDED_PATTERN = "Embedded-*"
 ASSETS_PAK = "Assets.pak"
 PAK_CONTENT = ["assets", "scripts", "std", "data", "config"]
-METADATA_FILE = "metadata.json"
 
 
 def require_assets_bundle(path: Path) -> None:
@@ -150,11 +149,9 @@ def bundle_assets_pak(project_dir: Path) -> None:
     assets_pak = project_dir / ASSETS_PAK
     require_assets_bundle(assets_pak)
 
-    copy_to_all_platforms(assets_pak, project_dir / DIST_DIR)
-
-
-def bundle_metadata(project_dir: Path) -> None:
-    copy_to_all_platforms(project_dir / METADATA_FILE, project_dir / DIST_DIR)
+    android_assets = dist_dir / ANDROID_DIST_DIR / "app" / "src" / "main" / "assets"
+    android_assets.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(assets_pak, android_assets / assets_pak.name)
 
 
 if __name__ == "__main__":
@@ -164,4 +161,3 @@ if __name__ == "__main__":
     bundle_runtime(RUNTIME_DIR, project_dir)
     bundle_assets(project_dir)
     bundle_assets_pak(project_dir)
-    bundle_metadata(project_dir)
